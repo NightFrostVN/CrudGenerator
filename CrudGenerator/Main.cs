@@ -14,7 +14,6 @@ namespace CrudGenerator
         public Main()
         {
             InitializeComponent();
-            System.Diagnostics.Debug.WriteLine(Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName);
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -23,8 +22,8 @@ namespace CrudGenerator
                 return;
             txtOutput.Clear();
             DatabaseUtilities.GetTableData(txtConnectionString.Text);
-            //if (CrudUtilities.LIST_TABLE.Count > 0)
-            //    GenerateScript();
+            if (CrudUtilities.LIST_TABLE.Count > 0)
+                GenerateScript();
             GenerateClass();
         }
 
