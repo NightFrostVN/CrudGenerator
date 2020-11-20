@@ -1,95 +1,54 @@
-﻿using System;
+﻿using CrudGenerator.Model;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CrudGenerator
+namespace CrudGenerator.Utility
 {
-    public partial class Form1 : Form
+    public static class DatabaseUtilities
     {
         /// <summary>
-        /// List các bảng
+        /// Lấy dữ liệu các bảng cần generate.
         /// </summary>
-        List<Table> LIST_TABLE = new List<Table>();
-        /// <summary>
-        /// List các cột id tự tăng
-        /// </summary>
-        List<TableColumn> LIST_IDENTITY_COLUMN = new List<TableColumn>();
-        /// <summary>
-        /// List các bảng không generate
-        /// </summary>
-        List<string> LIST_EXCLUDE_TABLE_NAME = new List<string>()
+        /// <param name="connectionString"></param>
+        public static void GetTableData(string connectionString)
         {
-            "sysdiagrams"
-        };
-        /// <summary>
-        /// List các tên cột không cho vào param khi read
-        /// </summary>
-        List<string> LIST_EXCLUDE_READ_PARAM_COLUMN_NAME = new List<string>()
-        {
-            "CreatedBy",
-            "ModifiedBy",
-            "CreatedDate",
-            "ModifiedDate"
-        };
-        /// <summary>
-        /// List các kiểu dữ liệu không cho vào param khi read
-        /// </summary>
-        List<string> LIST_EXCLUDE_READ_PARAM_COLUMN_DATA_TYPE = new List<string>()
-        {
-            "text",
-            "ntext"
-        };
-
-        public Form1()
-        {
-            InitializeComponent();
-        }
-
-        private void btnConnect_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtConnectionString.Text))
-                return;
+            CrudUtilities.LIST_TABLE.Clear();
+            CrudUtilities.LIST_IDENTITY_COLUMN.Clear();
             SqlConnection sqlConnection = new SqlConnection();
             try
             {
-                sqlConnection.ConnectionString = txtConnectionString.Text;
+                sqlConnection.ConnectionString = connectionString;
                 sqlConnection.Open();
-                txtOutput.Clear();
-                LIST_TABLE.Clear();
-                LIST_IDENTITY_COLUMN.Clear();
                 DataTable tbl = new DataTable();
                 SqlCommand cmd = new SqlCommand("SELECT * FROM sys.Tables order by name", sqlConnection);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(tbl);
                 for (int i = 0; i < tbl.Rows.Count; i++)
                 {
-                    if (!LIST_EXCLUDE_TABLE_NAME.Contains(tbl.Rows[i]["name"].ToString()))
-                        LIST_TABLE.Add(new Table { TableName = tbl.Rows[i]["name"].ToString() });
+                    if (!CrudUtilities.LIST_EXCLUDE_TABLE_NAME.Contains(tbl.Rows[i]["name"].ToString()))
+                        CrudUtilities.LIST_TABLE.Add(new Table { TableName = tbl.Rows[i]["name"].ToString() });
                 }
 
-                for (int i = 0; i < LIST_TABLE.Count; i++)
+                for (int i = 0; i < CrudUtilities.LIST_TABLE.Count; i++)
                 {
                     tbl.Clear();
-                    cmd.CommandText = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + LIST_TABLE[i].TableName + "' ORDER BY ORDINAL_POSITION;";
+                    cmd.CommandText = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + CrudUtilities.LIST_TABLE[i].TableName + "' ORDER BY ORDINAL_POSITION;";
                     da.Fill(tbl);
                     for (int j = 0; j < tbl.Rows.Count; j++)
                     {
                         TableColumn tableColumn = new TableColumn
                         {
-                            TableName = LIST_TABLE[i].TableName,
+                            TableName = CrudUtilities.LIST_TABLE[i].TableName,
                             ColumnName = tbl.Rows[j]["COLUMN_NAME"].ToString(),
                             IsNullable = tbl.Rows[j]["IS_NULLABLE"].ToString(),
                             DataType = tbl.Rows[j]["DATA_TYPE"].ToString(),
                             MaxLength = tbl.Rows[j]["CHARACTER_MAXIMUM_LENGTH"].ToString().Equals("-1") ? "max" : tbl.Rows[j]["CHARACTER_MAXIMUM_LENGTH"].ToString()
                         };
-                        LIST_TABLE[i].TableColumn.Add(tableColumn);
+                        CrudUtilities.LIST_TABLE[i].TableColumn.Add(tableColumn);
                     }
                 }
 
@@ -98,11 +57,9 @@ namespace CrudGenerator
                 da.Fill(tbl);
                 for (int i = 0; i < tbl.Rows.Count; i++)
                 {
-                    LIST_IDENTITY_COLUMN.Add(new TableColumn { ColumnName = tbl.Rows[i]["COLUMN_NAME"].ToString(), TableName = tbl.Rows[i]["TABLE_NAME"].ToString() });
+                    CrudUtilities.LIST_IDENTITY_COLUMN.Add(new TableColumn { ColumnName = tbl.Rows[i]["COLUMN_NAME"].ToString(), TableName = tbl.Rows[i]["TABLE_NAME"].ToString() });
                 }
                 sqlConnection.Close();
-
-                GenerateScript();
             }
             catch (Exception ex)
             {
@@ -115,32 +72,13 @@ namespace CrudGenerator
             }
         }
 
-        void GenerateScript()
-        {
-            StringBuilder sbCreate = GenerateCreate(LIST_TABLE);
-            txtOutput.AppendText("-----CREATE-----" + Environment.NewLine);
-            txtOutput.AppendText(sbCreate.ToString());
-
-            StringBuilder sbRead = GenerateRead(LIST_TABLE);
-            txtOutput.AppendText("-----READ-----" + Environment.NewLine);
-            txtOutput.AppendText(sbRead.ToString());
-
-            StringBuilder sbUpdate = GenerateUpdate(LIST_TABLE);
-            txtOutput.AppendText("-----UPDATE-----" + Environment.NewLine);
-            txtOutput.AppendText(sbUpdate.ToString());
-
-            StringBuilder sbDelete = GenerateDelete(LIST_TABLE);
-            txtOutput.AppendText("-----DELETE-----" + Environment.NewLine);
-            txtOutput.AppendText(sbDelete.ToString());
-        }
-
         /// <summary>
         /// Tạo thủ tục SQL Create.
-        /// Nếu có cột id tự tăng thủ tục sẽ có param DataReturn trả về id đó.
+        /// Nếu có cột id tự tăng thủ tục sẽ có param ReturnData trả về id đó, nếu không thì param ReturnData trả về -1.
         /// </summary>
         /// <param name="listTable"></param>
         /// <returns></returns>
-        StringBuilder GenerateCreate(List<Table> listTable)
+        public static StringBuilder GenerateCreate(List<Table> listTable)
         {
             StringBuilder sb = new StringBuilder();
             foreach (Table table in listTable)
@@ -153,18 +91,14 @@ namespace CrudGenerator
                 sb.AppendLine("alter procedure " + procName);
                 foreach (TableColumn tableColumn in table.TableColumn)
                 {
-                    if (!IsIdentityColumn(tableColumn))
-                    {
-                        if (IsMaxLengthColumn(tableColumn))
-                            sb.AppendLine("@" + tableColumn.ColumnName + " " + tableColumn.DataType + "(" + tableColumn.MaxLength + "),");
-                        else
-                            sb.AppendLine("@" + tableColumn.ColumnName + " " + tableColumn.DataType + ",");
-                    }
-                    else
+                    if (CrudUtilities.IsIdentityColumn(tableColumn))
                         hasIdentityColumn = true;
+                    if (CrudUtilities.IsMaxLengthColumn(tableColumn))
+                        sb.AppendLine("@" + tableColumn.ColumnName + " " + tableColumn.DataType + "(" + tableColumn.MaxLength + "),");
+                    else
+                        sb.AppendLine("@" + tableColumn.ColumnName + " " + tableColumn.DataType + ",");
                 }
-                if (hasIdentityColumn)
-                    sb.AppendLine("@DataReturn int output,");
+                sb.AppendLine("@ReturnData int output,");
                 sb.AppendLine("@ReturnCode int output,");
                 sb.AppendLine("@ReturnMess nvarchar(500) output");
                 sb.AppendLine("as");
@@ -173,7 +107,7 @@ namespace CrudGenerator
                 sb.Append("    insert into [" + table.TableName + "](");
                 for (int i = 0; i < table.TableColumn.Count; i++)
                 {
-                    if (!IsIdentityColumn(table.TableColumn[i]))
+                    if (!CrudUtilities.IsIdentityColumn(table.TableColumn[i]))
                     {
                         sb.Append("[" + table.TableColumn[i].ColumnName + "], ");
                     }
@@ -184,7 +118,7 @@ namespace CrudGenerator
                 sb.Append("    values (");
                 for (int i = 0; i < table.TableColumn.Count; i++)
                 {
-                    if (!IsIdentityColumn(table.TableColumn[i]))
+                    if (!CrudUtilities.IsIdentityColumn(table.TableColumn[i]))
                     {
                         sb.Append("@" + table.TableColumn[i].ColumnName + ", ");
                     }
@@ -194,8 +128,7 @@ namespace CrudGenerator
                 sb.AppendLine(")");
                 sb.AppendLine("end try");
                 sb.AppendLine("begin catch");
-                if (hasIdentityColumn)
-                    sb.AppendLine("    set @DataReturn = -1;");
+                sb.AppendLine("    set @ReturnData = -1;");
                 sb.AppendLine("    set @ReturnCode = ERROR_NUMBER();");
                 sb.AppendLine("    set @ReturnMess = ERROR_MESSAGE();");
                 sb.AppendLine("    if @@TRANCOUNT > 0");
@@ -206,7 +139,9 @@ namespace CrudGenerator
                 sb.AppendLine("if @@TRANCOUNT > 0");
                 sb.AppendLine("commit transaction;");
                 if (hasIdentityColumn)
-                    sb.AppendLine("set @DataReturn = SCOPE_IDENTITY();");
+                    sb.AppendLine("set @ReturnData = SCOPE_IDENTITY();");
+                else
+                    sb.AppendLine("set @ReturnData = -1;");
                 sb.AppendLine("set @ReturnCode = 0");
                 sb.AppendLine("set @ReturnMess = 'success'");
                 sb.AppendLine("go");
@@ -218,11 +153,11 @@ namespace CrudGenerator
         /// <summary>
         /// Tạo thủ tục SQL Read.
         /// Các cột thuộc mảng LIST_EXCLUDE_READ_PARAM_COLUMN_NAME sẽ không được truyền vào search parameter.
-        /// Nếu bảng có cột Status thì sẽ lấy những bản ghi có Status >= 0
+        /// Nếu bảng có cột Status thì sẽ lấy những bản ghi có Status >= 0.
         /// </summary>
         /// <param name="listTable"></param>
         /// <returns></returns>
-        StringBuilder GenerateRead(List<Table> listTable)
+        public static StringBuilder GenerateRead(List<Table> listTable)
         {
             StringBuilder sb = new StringBuilder();
             foreach (Table table in listTable)
@@ -232,9 +167,9 @@ namespace CrudGenerator
                 List<TableColumn> listParam = new List<TableColumn>(table.TableColumn);
                 foreach (TableColumn tableColumn in currentTable.TableColumn)
                 {
-                    if (LIST_EXCLUDE_READ_PARAM_COLUMN_NAME.Contains(tableColumn.ColumnName))
+                    if (CrudUtilities.LIST_EXCLUDE_READ_PARAM_COLUMN_NAME.Contains(tableColumn.ColumnName))
                         listParam.Remove(tableColumn);
-                    if (IsStatusColumn(tableColumn))
+                    if (CrudUtilities.IsStatusColumn(tableColumn))
                         statusColumnName = tableColumn.ColumnName;
                 }
                 string procName = "sp_" + table.TableName + "_Read";
@@ -244,7 +179,7 @@ namespace CrudGenerator
                 sb.AppendLine("alter procedure " + procName);
                 for (int i = 0; i < listParam.Count; i++)
                 {
-                    if (IsMaxLengthColumn(listParam[i]))
+                    if (CrudUtilities.IsMaxLengthColumn(listParam[i]))
                         sb.Append("@" + listParam[i].ColumnName + " " + listParam[i].DataType + "(" + listParam[i].MaxLength + ")");
                     else
                         sb.Append("@" + listParam[i].ColumnName + " " + listParam[i].DataType);
@@ -265,7 +200,7 @@ namespace CrudGenerator
                 }
                 for (int i = 0; i < listParam.Count; i++)
                 {
-                    if (!IsCharDataTypeColumn(listParam[i]))
+                    if (!CrudUtilities.IsCharDataTypeColumn(listParam[i]))
                         sb.Append("    (@" + listParam[i].ColumnName + " IS NULL OR a.[" + listParam[i].ColumnName + "] = @" + listParam[i].ColumnName + ")");
                     else
                         sb.Append("    (@" + listParam[i].ColumnName + " IS NULL OR a.[" + listParam[i].ColumnName + "] like N'%' + @" + listParam[i].ColumnName + " + '%')");
@@ -296,7 +231,7 @@ namespace CrudGenerator
         /// </summary>
         /// <param name="listTable"></param>
         /// <returns></returns>
-        StringBuilder GenerateUpdate(List<Table> listTable)
+        public static StringBuilder GenerateUpdate(List<Table> listTable)
         {
             StringBuilder returnData = new StringBuilder();
             foreach (Table table in listTable)
@@ -310,9 +245,9 @@ namespace CrudGenerator
                 sb.AppendLine("alter procedure " + procName);
                 foreach (TableColumn tableColumn in table.TableColumn)
                 {
-                    if (IsIdentityColumn(tableColumn))
+                    if (CrudUtilities.IsIdentityColumn(tableColumn))
                         identityColumnName = tableColumn.ColumnName;
-                    if (IsMaxLengthColumn(tableColumn))
+                    if (CrudUtilities.IsMaxLengthColumn(tableColumn))
                         sb.AppendLine("@" + tableColumn.ColumnName + " " + tableColumn.DataType + "(" + tableColumn.MaxLength + "),");
                     else
                         sb.AppendLine("@" + tableColumn.ColumnName + " " + tableColumn.DataType + ",");
@@ -320,6 +255,7 @@ namespace CrudGenerator
                 //Nếu bảng không có cột nào id tự tăng thì sẽ bỏ qua bảng đó
                 if (string.IsNullOrWhiteSpace(identityColumnName))
                     continue;
+                sb.AppendLine("@ReturnData int output,");
                 sb.AppendLine("@ReturnCode int output,");
                 sb.AppendLine("@ReturnMess nvarchar(500) output");
                 sb.AppendLine("as");
@@ -329,7 +265,7 @@ namespace CrudGenerator
                 sb.Append("        set ");
                 foreach (TableColumn tableColumn in table.TableColumn)
                 {
-                    if (!IsIdentityColumn(tableColumn))
+                    if (!CrudUtilities.IsIdentityColumn(tableColumn))
                         sb.Append("[" + tableColumn.ColumnName + "] = @" + tableColumn.ColumnName + ", ");
                 }
                 sb.Length--;
@@ -338,6 +274,7 @@ namespace CrudGenerator
                 sb.AppendLine("    where [" + identityColumnName + "] = @" + identityColumnName + ";");
                 sb.AppendLine("end try");
                 sb.AppendLine("begin catch");
+                sb.AppendLine("    set @ReturnData = -1;");
                 sb.AppendLine("    set @ReturnCode = ERROR_NUMBER();");
                 sb.AppendLine("    set @ReturnMess = ERROR_MESSAGE();");
                 sb.AppendLine("    if @@TRANCOUNT > 0");
@@ -347,6 +284,7 @@ namespace CrudGenerator
 
                 sb.AppendLine("if @@TRANCOUNT > 0");
                 sb.AppendLine("commit transaction;");
+                sb.AppendLine("set @ReturnData = @" + identityColumnName + ";");
                 sb.AppendLine("set @ReturnCode = 0");
                 sb.AppendLine("set @ReturnMess = 'success'");
                 sb.AppendLine("go");
@@ -363,7 +301,7 @@ namespace CrudGenerator
         /// </summary>
         /// <param name="listTable"></param>
         /// <returns></returns>
-        StringBuilder GenerateDelete(List<Table> listTable)
+        public static StringBuilder GenerateDelete(List<Table> listTable)
         {
             StringBuilder returnData = new StringBuilder();
             foreach (Table table in listTable)
@@ -378,20 +316,21 @@ namespace CrudGenerator
                 sb.AppendLine("alter procedure " + procName);
                 foreach (TableColumn tableColumn in table.TableColumn)
                 {
-                    if (IsIdentityColumn(tableColumn))
+                    if (CrudUtilities.IsIdentityColumn(tableColumn))
                     {
-                        if (IsMaxLengthColumn(tableColumn))
+                        if (CrudUtilities.IsMaxLengthColumn(tableColumn))
                             sb.AppendLine("@" + tableColumn.ColumnName + " " + tableColumn.DataType + "(" + tableColumn.MaxLength + "),");
                         else
                             sb.AppendLine("@" + tableColumn.ColumnName + " " + tableColumn.DataType + ",");
                         identityColumnName = tableColumn.ColumnName;
                     }
-                    if (IsStatusColumn(tableColumn))
+                    if (CrudUtilities.IsStatusColumn(tableColumn))
                         statusColumnName = tableColumn.ColumnName;
                 }
                 //Nếu bảng không có cột nào id tự tăng thì sẽ bỏ qua bảng đó
                 if (string.IsNullOrWhiteSpace(identityColumnName))
                     continue;
+                sb.AppendLine("@ReturnData int output,");
                 sb.AppendLine("@ReturnCode int output,");
                 sb.AppendLine("@ReturnMess nvarchar(500) output");
                 sb.AppendLine("as");
@@ -409,6 +348,7 @@ namespace CrudGenerator
                 }
                 sb.AppendLine("end try");
                 sb.AppendLine("begin catch");
+                sb.AppendLine("    set @ReturnData = -1;");
                 sb.AppendLine("    set @ReturnCode = ERROR_NUMBER();");
                 sb.AppendLine("    set @ReturnMess = ERROR_MESSAGE();");
                 sb.AppendLine("    if @@TRANCOUNT > 0");
@@ -418,6 +358,7 @@ namespace CrudGenerator
 
                 sb.AppendLine("if @@TRANCOUNT > 0");
                 sb.AppendLine("commit transaction;");
+                sb.AppendLine("set @ReturnData = @" + identityColumnName + ";");
                 sb.AppendLine("set @ReturnCode = 0");
                 sb.AppendLine("set @ReturnMess = 'success'");
                 sb.AppendLine("go");
@@ -425,57 +366,6 @@ namespace CrudGenerator
                 returnData.Append(sb);
             }
             return returnData;
-        }
-
-        /// <summary>
-        /// Kiểm tra xem có phải cột id tự tăng không
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        bool IsIdentityColumn(TableColumn column)
-        {
-            for (int i = 0; i < LIST_IDENTITY_COLUMN.Count; i++)
-            {
-                if (LIST_IDENTITY_COLUMN[i].TableName == column.TableName && LIST_IDENTITY_COLUMN[i].ColumnName == column.ColumnName)
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Kiểm tra xem cột có phải kiểu dữ liệu ký tự không
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        bool IsCharDataTypeColumn(TableColumn column)
-        {
-            if (column.DataType.Contains("char"))
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Kiểm tra xem cột có giới hạn số lượng ký tự không
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        bool IsMaxLengthColumn(TableColumn column)
-        {
-            if (!string.IsNullOrWhiteSpace(column.MaxLength) && !column.DataType.Equals("ntext"))
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Kiểm tra xem cột có phải là cột lưu Status không
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        bool IsStatusColumn(TableColumn column)
-        {
-            if (column.ColumnName.ToLower().Equals("status") && column.DataType.Equals("int"))
-                return true;
-            return false;
         }
     }
 }
