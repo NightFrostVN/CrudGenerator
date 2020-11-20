@@ -40,13 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataManipulation\TempDataManipulation.cs" />
-    <Compile Include="DataManipulation\WebsiteDataManipulation.cs" />
-    <Compile Include="DataManipulation\WebsiteDetailDataManipulation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository\TempRepository.cs" />
-    <Compile Include="Repository\WebsiteDetailRepository.cs" />
-    <Compile Include="Repository\WebsiteRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CrudCoreSystem\CrudCoreSystem.csproj">
@@ -58,7 +52,10 @@
       <Name>DTO</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DataManipulation\" />
+    <Folder Include="Repository\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
