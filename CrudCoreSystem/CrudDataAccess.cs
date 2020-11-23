@@ -68,24 +68,24 @@ namespace CrudCoreSystem
             conn.ConnectionString = "Server=.;Database=Crud;Integrated Security=true;";
         }
 
-        protected void CrudCreate()
+        protected void Create()
         {
-            ModifyData("sp_" + objModel.GetType().Name + "_Create");
+            ModifyData("sp_CRUD_" + objModel.GetType().Name + "_Create");
         }
 
-        protected void CrudDelete()
+        protected void Delete()
         {
-            ModifyData("sp_" + objModel.GetType().Name + "_Delete", true);
+            ModifyData("sp_CRUD_" + objModel.GetType().Name + "_Delete", true);
         }
 
-        protected void CrudRead()
+        protected void Read()
         {
-            ReadData("sp_" + objModel.GetType().Name + "_Read");
+            ReadData("sp_CRUD_" + objModel.GetType().Name + "_Read");
         }
 
-        protected void CrudUpdate()
+        protected void Update()
         {
-            ModifyData("sp_" + objModel.GetType().Name + "_Update");
+            ModifyData("sp_CRUD_" + objModel.GetType().Name + "_Update");
         }
 
         protected void ExecuteProcedure(string procedureName, List<SqlParameter> listParam, bool isReturnDataTable)

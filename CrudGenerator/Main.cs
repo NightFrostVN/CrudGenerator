@@ -23,8 +23,10 @@ namespace CrudGenerator
             txtOutput.Clear();
             DatabaseUtilities.GetTableData(txtConnectionString.Text);
             if (CrudUtilities.LIST_TABLE.Count > 0)
+            {
                 GenerateScript();
-            GenerateClass();
+                GenerateClass();
+            }
         }
 
         void GenerateScript()

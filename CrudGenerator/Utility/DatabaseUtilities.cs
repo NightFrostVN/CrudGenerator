@@ -24,7 +24,7 @@ namespace CrudGenerator.Utility
                 sqlConnection.ConnectionString = connectionString;
                 sqlConnection.Open();
                 DataTable tbl = new DataTable();
-                SqlCommand cmd = new SqlCommand("SELECT * FROM sys.Tables order by name", sqlConnection);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM sys.Tables where name = 'HoSoThau' order by name", sqlConnection);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(tbl);
                 for (int i = 0; i < tbl.Rows.Count; i++)
@@ -84,7 +84,7 @@ namespace CrudGenerator.Utility
             foreach (Table table in listTable)
             {
                 bool hasIdentityColumn = false;
-                string procName = "sp_" + table.TableName + "_Create";
+                string procName = "sp_CRUD_" + table.TableName + "_Create";
                 sb.AppendLine("if object_id('dbo." + procName + "', 'p') is null");
                 sb.AppendLine("    exec ('create procedure " + procName + " as select 1')");
                 sb.AppendLine("go");
@@ -172,7 +172,7 @@ namespace CrudGenerator.Utility
                     if (CrudUtilities.IsStatusColumn(tableColumn))
                         statusColumnName = tableColumn.ColumnName;
                 }
-                string procName = "sp_" + table.TableName + "_Read";
+                string procName = "sp_CRUD_" + table.TableName + "_Read";
                 sb.AppendLine("if object_id('dbo." + procName + "', 'p') is null");
                 sb.AppendLine("    exec ('create procedure " + procName + " as select 1')");
                 sb.AppendLine("go");
@@ -238,7 +238,7 @@ namespace CrudGenerator.Utility
             {
                 StringBuilder sb = new StringBuilder();
                 string identityColumnName = null;
-                string procName = "sp_" + table.TableName + "_Update";
+                string procName = "sp_CRUD_" + table.TableName + "_Update";
                 sb.AppendLine("if object_id('dbo." + procName + "', 'p') is null");
                 sb.AppendLine("    exec ('create procedure " + procName + " as select 1')");
                 sb.AppendLine("go");
@@ -309,7 +309,7 @@ namespace CrudGenerator.Utility
                 StringBuilder sb = new StringBuilder();
                 string identityColumnName = null;
                 string statusColumnName = null;
-                string procName = "sp_" + table.TableName + "_Delete";
+                string procName = "sp_CRUD_" + table.TableName + "_Delete";
                 sb.AppendLine("if object_id('dbo." + procName + "', 'p') is null");
                 sb.AppendLine("    exec ('create procedure " + procName + " as select 1')");
                 sb.AppendLine("go");

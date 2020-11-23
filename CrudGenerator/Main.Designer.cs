@@ -49,7 +49,7 @@
             this.txtConnectionString.Name = "txtConnectionString";
             this.txtConnectionString.Size = new System.Drawing.Size(554, 20);
             this.txtConnectionString.TabIndex = 1;
-            this.txtConnectionString.Text = "Server=.;Database=Crud;Integrated Security=true;";
+            this.txtConnectionString.Text = "Server=10.23.11.40;Database=TNG.DauThau;User Id=tng;Password=123";
             // 
             // btnConnect
             // 
@@ -70,7 +70,7 @@
             this.txtOutput.Size = new System.Drawing.Size(730, 371);
             this.txtOutput.TabIndex = 3;
             // 
-            // Form1
+            // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -79,7 +79,7 @@
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.txtConnectionString);
             this.Controls.Add(this.label1);
-            this.Name = "Form1";
+            this.Name = "Main";
             this.Text = "Form1";
             this.ResumeLayout(false);
             this.PerformLayout();

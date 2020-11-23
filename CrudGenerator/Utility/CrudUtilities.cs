@@ -46,7 +46,6 @@ namespace CrudGenerator.Utility
         /// <summary>
         /// Kiểm tra xem có phải cột id tự tăng không.
         /// </summary>
-        /// <param name="listIdentityColumn"></param>
         /// <param name="column"></param>
         /// <returns></returns>
         public static bool IsIdentityColumn(TableColumn column)

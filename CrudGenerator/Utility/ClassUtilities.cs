@@ -73,6 +73,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("using System;");
                 sb.AppendLine("using System.Collections.Generic;");
                 sb.AppendLine("using System.Data;");
+                sb.AppendLine("using System.Data.SqlClient;");
                 sb.AppendLine("");
                 sb.AppendLine("namespace " + DAL_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME );
                 sb.AppendLine("{");
@@ -90,13 +91,13 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("        public void Create(" + modelName + " _objModel)");
                 sb.AppendLine("        {");
                 sb.AppendLine("            objModel = _objModel;");
-                sb.AppendLine("            CrudCreate();");
+                sb.AppendLine("            Create();");
                 sb.AppendLine("        }");
                 sb.AppendLine("");
                 sb.AppendLine("        public List<" + modelName + "> Read(" + modelName + " _objModel)");
                 sb.AppendLine("        {");
                 sb.AppendLine("            objModel = _objModel;");
-                sb.AppendLine("            CrudRead();");
+                sb.AppendLine("            Read();");
                 sb.AppendLine("            List<" + modelName + "> returnList = new List<" + modelName + ">();");
                 sb.AppendLine("            foreach (DataRow dr in returnDataTable.Rows)");
                 sb.AppendLine("            {");
@@ -121,13 +122,17 @@ namespace CrudGenerator.Utility
                     sb.AppendLine("        public void Update(" + modelName + " _objModel)");
                     sb.AppendLine("        {");
                     sb.AppendLine("            objModel = _objModel;");
-                    sb.AppendLine("            CrudUpdate();");
+                    sb.AppendLine("            Update();");
                     sb.AppendLine("        }");
                     sb.AppendLine("");
                     sb.AppendLine("        public void Delete(" + modelName + " _objModel)");
                     sb.AppendLine("        {");
                     sb.AppendLine("            objModel = _objModel;");
-                    sb.AppendLine("            CrudDelete();");
+                    sb.AppendLine("            Delete();");
+                    sb.AppendLine("        }");
+                    sb.AppendLine("        public new void ExecuteProcedure(string procedureName, List<SqlParameter> listParam, bool isReturnDataTable)");
+                    sb.AppendLine("        {");
+                    sb.AppendLine("            base.ExecuteProcedure(procedureName, listParam, isReturnDataTable);");
                     sb.AppendLine("        }");
                 }
                 sb.AppendLine("    }");
