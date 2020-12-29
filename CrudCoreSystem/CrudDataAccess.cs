@@ -17,7 +17,7 @@ namespace CrudCoreSystem
         private int returnData;
         private SqlConnection conn;
 
-        protected DataTable returnDataTable = new DataTable();
+        protected DataTable returnDataTable = null;
         protected object objModel;
         protected string identityColumnName;
 
@@ -114,6 +114,8 @@ namespace CrudCoreSystem
                 }
                 else
                 {
+					returnDataTable = null;
+                    returnDataTable = new DataTable();
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     da.Fill(returnDataTable);
                     da.Dispose();
@@ -237,7 +239,8 @@ namespace CrudCoreSystem
                     param.Value = value;
                     cmd.Parameters.Add(param);
                 }
-
+				returnDataTable = null;
+                returnDataTable = new DataTable();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(returnDataTable);
                 da.Dispose();

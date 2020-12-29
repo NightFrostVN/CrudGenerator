@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Data;
-using System.Data.SqlClient;
 using System.Text;
 using System.Windows.Forms;
 using CrudGenerator.Utility;
-using CrudGenerator.Model;
-using System.IO;
 
 namespace CrudGenerator
 {
