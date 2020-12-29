@@ -4,9 +4,7 @@
 
 /CrudGenerator/obj/Debug
 /CrudGenerator/bin/Debug
-/DTO/bin/Debug
-/DTO/obj/Debug
-/DAL/obj/Debug
-/DAL/bin/Debug
+/DataAccess/bin/Debug
+/DataAccess/obj/Debug
 /CrudCoreSystem/obj/Debug
 /CrudCoreSystem/bin/Debug
