@@ -11,24 +11,24 @@ namespace CrudGenerator.Utility
     public static class ClassUtilities
     {
         private static string ROOT_PATH = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-        private static string DTO_FOLDER_NAME = "DTO";
-        private static string DAL_FOLDER_NAME = "DAL";
+        private static string DATA_ACCESS_FOLDER_NAME = "DataAccess";
         private static string DATA_MANIPULATION_FOLDER_NAME = "DataManipulation";
         private static string REPOSITORY_FOLDER_NAME = "Repository";
+        private static string MODEL_FOLDER_NAME = "Model";
 
         /// <summary>
         /// Tạo các class DTO, lưu trong project DTO.
         /// </summary>
         public static void GenerateDTO()
         {
-            Directory.CreateDirectory(ROOT_PATH + "\\" + DTO_FOLDER_NAME);
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE)
             {
                 string modelName = table.TableName;
                 sb.AppendLine("using System;");
                 sb.AppendLine("");
-                sb.AppendLine("namespace DTO");
+                sb.AppendLine("namespace " + MODEL_FOLDER_NAME);
                 sb.AppendLine("{");
                 sb.AppendLine("    public class " + modelName);
                 sb.AppendLine("    {");
@@ -43,7 +43,7 @@ namespace CrudGenerator.Utility
                 }
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
-                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DTO_FOLDER_NAME + "\\" + modelName + ".cs"))
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME + "\\" + modelName + ".cs"))
                 {
                     file.WriteLine(sb.ToString());
                 }
@@ -57,7 +57,7 @@ namespace CrudGenerator.Utility
         /// </summary>
         public static void GenerateDataManipulation()
         {
-            Directory.CreateDirectory(ROOT_PATH + "\\" + DAL_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME);
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE)
             {
@@ -69,13 +69,13 @@ namespace CrudGenerator.Utility
                         identityColumnName = column.ColumnName;
                 }
                 sb.AppendLine("using CrudCoreSystem;");
-                sb.AppendLine("using " + DTO_FOLDER_NAME + ";");
+                sb.AppendLine("using " + MODEL_FOLDER_NAME + ";");
                 sb.AppendLine("using System;");
                 sb.AppendLine("using System.Collections.Generic;");
                 sb.AppendLine("using System.Data;");
                 sb.AppendLine("using System.Data.SqlClient;");
                 sb.AppendLine("");
-                sb.AppendLine("namespace " + DAL_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME );
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME );
                 sb.AppendLine("{");
                 sb.AppendLine("    /// <summary>");
                 sb.AppendLine("    /// Class lưu các hàm CRUD bảng " + modelName + ".");
@@ -137,7 +137,7 @@ namespace CrudGenerator.Utility
                 }
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
-                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DAL_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME + "\\" + modelName + DATA_MANIPULATION_FOLDER_NAME + ".cs"))
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME + "\\" + modelName + DATA_MANIPULATION_FOLDER_NAME + ".cs"))
                 {
                     file.WriteLine(sb.ToString());
                 }
@@ -150,14 +150,14 @@ namespace CrudGenerator.Utility
         /// </summary>
         public static void GenerateRepository()
         {
-            Directory.CreateDirectory(ROOT_PATH + "\\" + DAL_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME);
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE)
             {
                 string modelName = table.TableName;
-                sb.AppendLine("using " + DAL_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME + ";");
+                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME + ";");
                 sb.AppendLine("");
-                sb.AppendLine("namespace " + DAL_FOLDER_NAME + "." + REPOSITORY_FOLDER_NAME);
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + REPOSITORY_FOLDER_NAME);
                 sb.AppendLine("{");
                 sb.AppendLine("    /// <summary>");
                 sb.AppendLine("    /// Class lưu các phương thức thao tác dữ liệu khác của bảng " + modelName + ".");
@@ -167,7 +167,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("");
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
-                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DAL_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME + "\\" + modelName + REPOSITORY_FOLDER_NAME + ".cs"))
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME + "\\" + modelName + REPOSITORY_FOLDER_NAME + ".cs"))
                 {
                     file.WriteLine(sb.ToString());
                 }
