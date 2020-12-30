@@ -84,7 +84,7 @@ namespace CrudGenerator.Utility
             foreach (Table table in listTable)
             {
                 bool hasIdentityColumn = false;
-                string procName = "sp_CRUD_" + table.TableName + "_Create";
+                string procName = "CRUD_" + table.TableName + "_Create";
                 sb.AppendLine("if object_id('dbo." + procName + "', 'p') is null");
                 sb.AppendLine("    exec ('create procedure " + procName + " as select 1')");
                 sb.AppendLine("go");
@@ -172,7 +172,7 @@ namespace CrudGenerator.Utility
                     if (CrudUtilities.IsStatusColumn(tableColumn))
                         statusColumnName = tableColumn.ColumnName;
                 }
-                string procName = "sp_CRUD_" + table.TableName + "_Read";
+                string procName = "CRUD_" + table.TableName + "_Read";
                 sb.AppendLine("if object_id('dbo." + procName + "', 'p') is null");
                 sb.AppendLine("    exec ('create procedure " + procName + " as select 1')");
                 sb.AppendLine("go");
@@ -238,7 +238,7 @@ namespace CrudGenerator.Utility
             {
                 StringBuilder sb = new StringBuilder();
                 string identityColumnName = null;
-                string procName = "sp_CRUD_" + table.TableName + "_Update";
+                string procName = "CRUD_" + table.TableName + "_Update";
                 sb.AppendLine("if object_id('dbo." + procName + "', 'p') is null");
                 sb.AppendLine("    exec ('create procedure " + procName + " as select 1')");
                 sb.AppendLine("go");
@@ -309,7 +309,7 @@ namespace CrudGenerator.Utility
                 StringBuilder sb = new StringBuilder();
                 string identityColumnName = null;
                 string statusColumnName = null;
-                string procName = "sp_CRUD_" + table.TableName + "_Delete";
+                string procName = "CRUD_" + table.TableName + "_Delete";
                 sb.AppendLine("if object_id('dbo." + procName + "', 'p') is null");
                 sb.AppendLine("    exec ('create procedure " + procName + " as select 1')");
                 sb.AppendLine("go");

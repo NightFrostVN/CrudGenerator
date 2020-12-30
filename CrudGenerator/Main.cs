@@ -48,7 +48,7 @@ namespace CrudGenerator
         {
             ClassUtilities.GenerateDTO();
             ClassUtilities.GenerateRepository();
-            ClassUtilities.GenerateDataManipulation();
+            ClassUtilities.GenerateDataManipulation(txtConnectionString.Text);
         }
     }
 }

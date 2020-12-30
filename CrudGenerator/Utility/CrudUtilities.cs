@@ -72,6 +72,19 @@ namespace CrudGenerator.Utility
         }
 
         /// <summary>
+        /// Kiểm tra xem cột có phải kiểu dữ liệu float không.
+        /// Trả về true nếu kiểu dữ liệu có chứa cụm từ "float".
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public static bool IsFloatDataTypeColumn(TableColumn column)
+        {
+            if (column.DataType.Contains("float"))
+                return true;
+            return false;
+        }
+
+        /// <summary>
         /// Kiểm tra xem cột có phải kiểu dữ liệu int không.
         /// Trả về true nếu kiểu dữ liệu có chứa cụm từ "int".
         /// </summary>

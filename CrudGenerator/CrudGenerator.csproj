@@ -83,16 +83,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CrudCoreSystem\CrudCoreSystem.csproj">
-      <Project>{867C8785-B96A-4C34-B608-73A8249CA7AF}</Project>
-      <Name>CrudCoreSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DAL\DAL.csproj">
-      <Project>{789FB2D7-5114-4EC6-B807-84B311999D27}</Project>
-      <Name>DAL</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

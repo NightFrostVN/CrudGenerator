@@ -40,6 +40,8 @@ namespace CrudGenerator.Utility
                         sb.AppendLine("        public string " + column.ColumnName + " { get; set; }");
                     else if (CrudUtilities.IsDateDataTypeColumn(column))
                         sb.AppendLine("        public DateTime? " + column.ColumnName + " { get; set; }");
+                    else if (CrudUtilities.IsFloatDataTypeColumn(column))
+                        sb.AppendLine("        public float? " + column.ColumnName + " { get; set; }");
                 }
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
@@ -55,7 +57,7 @@ namespace CrudGenerator.Utility
         /// Tạo các class DataManipulation. Lưu trong project DAL.
         /// Những bảng nào không có id tự tăng thì sẽ không có hàm Update và Delete.
         /// </summary>
-        public static void GenerateDataManipulation()
+        public static void GenerateDataManipulation(string connectionString)
         {
             Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
@@ -85,6 +87,8 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("    {");
                 sb.AppendLine("        protected " + modelName + DATA_MANIPULATION_FOLDER_NAME + "()");
                 sb.AppendLine("        {");
+                sb.AppendLine("            CONNECTION_STRING = \"" + connectionString + "\";");
+                sb.AppendLine("            SetupConnection();");
                 sb.AppendLine("            identityColumnName = \"" + identityColumnName + "\";");
                 sb.AppendLine("        }");
                 sb.AppendLine("");
@@ -111,6 +115,8 @@ namespace CrudGenerator.Utility
                         sb.AppendLine("                if (!string.IsNullOrWhiteSpace(dr[\"" + columnName + "\"].ToString())) model." + columnName + " = dr[\"" + columnName + "\"].ToString(); else model." + columnName + " = null;");
                     else if (CrudUtilities.IsDateDataTypeColumn(column))
                         sb.AppendLine("                if (!string.IsNullOrWhiteSpace(dr[\"" + columnName + "\"].ToString())) model." + columnName + " = DateTime.Parse(dr[\"" + columnName + "\"].ToString()); else model." + columnName + " = null;");
+                    if (CrudUtilities.IsFloatDataTypeColumn(column))
+                        sb.AppendLine("                if (!string.IsNullOrWhiteSpace(dr[\"" + columnName + "\"].ToString())) model." + columnName + " = float.Parse(dr[\"" + columnName + "\"].ToString()); else model." + columnName + " = null;");
                 }
                 sb.AppendLine("                returnList.Add(model);");
                 sb.AppendLine("            }");

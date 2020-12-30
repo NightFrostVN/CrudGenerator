@@ -14,5 +14,10 @@ namespace CrudCoreSystem
             "CreatedDate",
             "ModifiedDate"
         };
+
+        /// <summary>
+        /// Connection string
+        /// </summary>
+        protected string CONNECTION_STRING = "";
     }
 }

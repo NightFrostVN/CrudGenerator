@@ -62,30 +62,32 @@ namespace CrudCoreSystem
         }
         #endregion
 
-        protected CrudDataAccess()
+        protected CrudDataAccess() { }
+
+        public void SetupConnection()
         {
             conn = new SqlConnection();
-            conn.ConnectionString = "Server=.;Database=Crud;Integrated Security=true;";
+            conn.ConnectionString = CONNECTION_STRING;
         }
 
         protected void Create()
         {
-            ModifyData("sp_CRUD_" + objModel.GetType().Name + "_Create");
+            ModifyData("CRUD_" + objModel.GetType().Name + "_Create");
         }
 
         protected void Delete()
         {
-            ModifyData("sp_CRUD_" + objModel.GetType().Name + "_Delete", true);
+            ModifyData("CRUD_" + objModel.GetType().Name + "_Delete", true);
         }
 
         protected void Read()
         {
-            ReadData("sp_CRUD_" + objModel.GetType().Name + "_Read");
+            ReadData("CRUD_" + objModel.GetType().Name + "_Read");
         }
 
         protected void Update()
         {
-            ModifyData("sp_CRUD_" + objModel.GetType().Name + "_Update");
+            ModifyData("CRUD_" + objModel.GetType().Name + "_Update");
         }
 
         protected void ExecuteProcedure(string procedureName, List<SqlParameter> listParam, bool isReturnDataTable)
@@ -114,7 +116,7 @@ namespace CrudCoreSystem
                 }
                 else
                 {
-					returnDataTable = null;
+                    returnDataTable = null;
                     returnDataTable = new DataTable();
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     da.Fill(returnDataTable);
@@ -239,7 +241,7 @@ namespace CrudCoreSystem
                     param.Value = value;
                     cmd.Parameters.Add(param);
                 }
-				returnDataTable = null;
+                returnDataTable = null;
                 returnDataTable = new DataTable();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(returnDataTable);

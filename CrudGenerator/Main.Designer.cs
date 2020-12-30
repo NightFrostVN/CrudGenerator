@@ -80,7 +80,7 @@
             this.Controls.Add(this.txtConnectionString);
             this.Controls.Add(this.label1);
             this.Name = "Main";
-            this.Text = "Form1";
+            this.Text = "CRUD Generator";
             this.ResumeLayout(false);
             this.PerformLayout();
 
