@@ -16,7 +16,7 @@ namespace CrudCoreSystem
         };
 
         /// <summary>
-        /// Connection string
+        /// Lưu chuỗi kết nối
         /// </summary>
         protected string CONNECTION_STRING = "";
     }

@@ -24,7 +24,7 @@ namespace CrudGenerator.Utility
                 sqlConnection.ConnectionString = connectionString;
                 sqlConnection.Open();
                 DataTable tbl = new DataTable();
-                SqlCommand cmd = new SqlCommand("SELECT * FROM sys.Tables where name = 'HoSoThau' order by name", sqlConnection);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM sys.Tables order by name", sqlConnection);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(tbl);
                 for (int i = 0; i < tbl.Rows.Count; i++)

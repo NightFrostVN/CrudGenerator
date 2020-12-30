@@ -49,7 +49,7 @@
             this.txtConnectionString.Name = "txtConnectionString";
             this.txtConnectionString.Size = new System.Drawing.Size(554, 20);
             this.txtConnectionString.TabIndex = 1;
-            this.txtConnectionString.Text = "Server=10.23.11.40;Database=TNG.DauThau;User Id=tng;Password=123";
+            this.txtConnectionString.Text = "Server=.;Database=Crud;Integrated security=True";
             // 
             // btnConnect
             // 

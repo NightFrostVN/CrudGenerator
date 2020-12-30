@@ -13,11 +13,37 @@ namespace CrudGenerator.Utility
         private static string ROOT_PATH = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
         private static string DATA_ACCESS_FOLDER_NAME = "DataAccess";
         private static string DATA_MANIPULATION_FOLDER_NAME = "DataManipulation";
-        private static string REPOSITORY_FOLDER_NAME = "Repository";
-        private static string MODEL_FOLDER_NAME = "Model";
+        private static string REPOSITORY_FOLDER_NAME = "DataRepository";
+        private static string MODEL_FOLDER_NAME = "DataModel";
+        private static string DATABASE_CONFIG_FOLDER_NAME = "DatabaseConfig";
 
         /// <summary>
-        /// Tạo các class DTO, lưu trong project DTO.
+        /// Tạo class lưu chuỗi kết nối.
+        /// </summary>
+        /// <param name="connectionString"></param>
+        public static void GenerateConnection(string connectionString)
+        {
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATABASE_CONFIG_FOLDER_NAME);
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + DATABASE_CONFIG_FOLDER_NAME);
+            sb.AppendLine("{");
+            sb.AppendLine("    /// <summary>");
+            sb.AppendLine("    /// Class lưu chuỗi kết nối DB.");
+            sb.AppendLine("    /// </summary>");
+            sb.AppendLine("    public class DatabaseConnectionString");
+            sb.AppendLine("    {");
+            sb.AppendLine("        public static string CONNECTION_STRING = \"" + connectionString + "\";");
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
+            using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATABASE_CONFIG_FOLDER_NAME + "\\DatabaseConnectionString.cs"))
+            {
+                file.WriteLine(sb.ToString());
+            }
+            sb.Clear();
+        }
+
+        /// <summary>
+        /// Tạo các class Model, lưu trong thư mục MODEL_FOLDER_NAME.
         /// </summary>
         public static void GenerateDTO()
         {
@@ -28,7 +54,7 @@ namespace CrudGenerator.Utility
                 string modelName = table.TableName;
                 sb.AppendLine("using System;");
                 sb.AppendLine("");
-                sb.AppendLine("namespace " + MODEL_FOLDER_NAME);
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME);
                 sb.AppendLine("{");
                 sb.AppendLine("    public class " + modelName);
                 sb.AppendLine("    {");
@@ -54,10 +80,10 @@ namespace CrudGenerator.Utility
         }
 
         /// <summary>
-        /// Tạo các class DataManipulation. Lưu trong project DAL.
+        /// Tạo các class DataManipulation. Lưu trong thư mục DATA_MANIPULATION_FOLDER_NAME.
         /// Những bảng nào không có id tự tăng thì sẽ không có hàm Update và Delete.
         /// </summary>
-        public static void GenerateDataManipulation(string connectionString)
+        public static void GenerateDataManipulation()
         {
             Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
@@ -71,7 +97,8 @@ namespace CrudGenerator.Utility
                         identityColumnName = column.ColumnName;
                 }
                 sb.AppendLine("using CrudCoreSystem;");
-                sb.AppendLine("using " + MODEL_FOLDER_NAME + ";");
+                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME + ";");
+                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATABASE_CONFIG_FOLDER_NAME + ";");
                 sb.AppendLine("using System;");
                 sb.AppendLine("using System.Collections.Generic;");
                 sb.AppendLine("using System.Data;");
@@ -87,7 +114,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("    {");
                 sb.AppendLine("        protected " + modelName + DATA_MANIPULATION_FOLDER_NAME + "()");
                 sb.AppendLine("        {");
-                sb.AppendLine("            CONNECTION_STRING = \"" + connectionString + "\";");
+                sb.AppendLine("            CONNECTION_STRING = DatabaseConnectionString.CONNECTION_STRING;");
                 sb.AppendLine("            SetupConnection();");
                 sb.AppendLine("            identityColumnName = \"" + identityColumnName + "\";");
                 sb.AppendLine("        }");
@@ -152,7 +179,7 @@ namespace CrudGenerator.Utility
         }
 
         /// <summary>
-        /// Tạo các class Repository. Lưu trong project DAL.
+        /// Tạo các class Repository. Lưu trong thư mục REPOSITORY_FOLDER_NAME.
         /// </summary>
         public static void GenerateRepository()
         {
