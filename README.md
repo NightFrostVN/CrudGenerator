@@ -92,7 +92,7 @@ else //Có lỗi
     MessageBox.Show("Không thể truy vấn dữ liệu. Lỗi: " + repo.ReturnMess);
 ```
 #### 3.5. Custom query
-- Khai báo thêm hàm trong class __DataRepository__ của bảng. Sử dụng hàm __ExecuteProcedure(string procedureName, List<SqlParameter> listParam, bool isReturnDataTable)__ để truy vấn dữ liệu.
+- Khai báo thêm hàm trong class __DataRepository__ của bảng. Sử dụng hàm ``ExecuteProcedure(string procedureName, List<SqlParameter> listParam, bool isReturnDataTable)`` để truy vấn dữ liệu.
 ```c#
 public class HoSoThauRepository : HoSoThauDataManipulation
 {
