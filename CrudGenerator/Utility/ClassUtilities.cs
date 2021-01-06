@@ -115,21 +115,21 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("        protected " + modelName + DATA_MANIPULATION_FOLDER_NAME + "()");
                 sb.AppendLine("        {");
                 sb.AppendLine("            SetupConnection(DatabaseConnectionString.CONNECTION_STRING);");
-                sb.AppendLine("            identityColumnName = \"" + identityColumnName + "\";");
+                sb.AppendLine("            IdentityColumnName = \"" + identityColumnName + "\";");
                 sb.AppendLine("        }");
                 sb.AppendLine("");
                 sb.AppendLine("        public void Create(" + modelName + " _objModel)");
                 sb.AppendLine("        {");
-                sb.AppendLine("            objModel = _objModel;");
+                sb.AppendLine("            ObjModel = _objModel;");
                 sb.AppendLine("            Create();");
                 sb.AppendLine("        }");
                 sb.AppendLine("");
                 sb.AppendLine("        public List<" + modelName + "> Read(" + modelName + " _objModel)");
                 sb.AppendLine("        {");
-                sb.AppendLine("            objModel = _objModel;");
+                sb.AppendLine("            ObjModel = _objModel;");
                 sb.AppendLine("            Read();");
                 sb.AppendLine("            List<" + modelName + "> returnList = new List<" + modelName + ">();");
-                sb.AppendLine("            foreach (DataRow dr in returnDataTable.Rows)");
+                sb.AppendLine("            foreach (DataRow dr in ReturnDataTable.Rows)");
                 sb.AppendLine("            {");
                 sb.AppendLine("                " + modelName + " model = new " + modelName + "();");
                 foreach (TableColumn column in table.TableColumn)
@@ -153,13 +153,13 @@ namespace CrudGenerator.Utility
                 {
                     sb.AppendLine("        public void Update(" + modelName + " _objModel)");
                     sb.AppendLine("        {");
-                    sb.AppendLine("            objModel = _objModel;");
+                    sb.AppendLine("            ObjModel = _objModel;");
                     sb.AppendLine("            Update();");
                     sb.AppendLine("        }");
                     sb.AppendLine("");
                     sb.AppendLine("        public void Delete(" + modelName + " _objModel)");
                     sb.AppendLine("        {");
-                    sb.AppendLine("            objModel = _objModel;");
+                    sb.AppendLine("            ObjModel = _objModel;");
                     sb.AppendLine("            Delete();");
                     sb.AppendLine("        }");
                     sb.AppendLine("        public new void ExecuteProcedure(string procedureName, List<SqlParameter> listParam, bool isReturnDataTable)");
