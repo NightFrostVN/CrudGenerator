@@ -10,8 +10,19 @@ namespace CrudCoreSystem
     /// Class lưu các hàm thực hiện CRUD chung.
     /// KHÔNG ĐƯỢC SỬA HOẶC KHAI BÁO THÊM HÀM TRONG CLASS NÀY.
     /// </summary>
-    public class CrudDataAccess : CrudConstant
+    public class CrudDataAccess
     {
+        /// <summary>
+        /// List các tên cột không cho vào param khi read
+        /// </summary>
+        private List<string> LIST_EXCLUDE_READ_PARAM_COLUMN_NAME = new List<string>()
+        {
+            "CreatedBy",
+            "ModifiedBy",
+            "CreatedDate",
+            "ModifiedDate"
+        };
+
         private int returnCode;
         private string returnMess;
         private int returnData;
@@ -64,10 +75,9 @@ namespace CrudCoreSystem
 
         protected CrudDataAccess() { }
 
-        public void SetupConnection()
+        public void SetupConnection(string connectionString)
         {
-            conn = new SqlConnection();
-            conn.ConnectionString = CONNECTION_STRING;
+            conn = new SqlConnection(connectionString);
         }
 
         protected void Create()

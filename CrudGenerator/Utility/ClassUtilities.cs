@@ -114,8 +114,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("    {");
                 sb.AppendLine("        protected " + modelName + DATA_MANIPULATION_FOLDER_NAME + "()");
                 sb.AppendLine("        {");
-                sb.AppendLine("            CONNECTION_STRING = DatabaseConnectionString.CONNECTION_STRING;");
-                sb.AppendLine("            SetupConnection();");
+                sb.AppendLine("            SetupConnection(DatabaseConnectionString.CONNECTION_STRING);");
                 sb.AppendLine("            identityColumnName = \"" + identityColumnName + "\";");
                 sb.AppendLine("        }");
                 sb.AppendLine("");
