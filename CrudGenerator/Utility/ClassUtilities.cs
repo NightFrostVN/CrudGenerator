@@ -45,11 +45,11 @@ namespace CrudGenerator.Utility
         /// <summary>
         /// Tạo các class Model, lưu trong thư mục MODEL_FOLDER_NAME.
         /// </summary>
-        public static void GenerateDTO()
+        public static void GenerateModel()
         {
             Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
-            foreach (Table table in CrudUtilities.LIST_TABLE)
+            foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 string modelName = table.TableName;
                 sb.AppendLine("using System;");
@@ -83,11 +83,11 @@ namespace CrudGenerator.Utility
         /// Tạo các class DataManipulation. Lưu trong thư mục DATA_MANIPULATION_FOLDER_NAME.
         /// Những bảng nào không có id tự tăng thì sẽ không có hàm Update và Delete.
         /// </summary>
-        public static void GenerateDataManipulation()
+        public static void GenerateManipulation()
         {
             Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
-            foreach (Table table in CrudUtilities.LIST_TABLE)
+            foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 string modelName = table.TableName;
                 string identityColumnName = "";
@@ -185,7 +185,7 @@ namespace CrudGenerator.Utility
         {
             Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
-            foreach (Table table in CrudUtilities.LIST_TABLE)
+            foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 string modelName = table.TableName;
                 sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME + ";");

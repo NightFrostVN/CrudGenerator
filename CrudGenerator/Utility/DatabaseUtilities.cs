@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -30,7 +31,7 @@ namespace CrudGenerator.Utility
                 for (int i = 0; i < tbl.Rows.Count; i++)
                 {
                     if (!CrudUtilities.LIST_EXCLUDE_TABLE_NAME.Contains(tbl.Rows[i]["name"].ToString()))
-                        CrudUtilities.LIST_TABLE.Add(new Table { TableName = tbl.Rows[i]["name"].ToString() });
+                        CrudUtilities.LIST_TABLE.Add(new Table { TableName = tbl.Rows[i]["name"].ToString(), Active = false });
                 }
 
                 for (int i = 0; i < CrudUtilities.LIST_TABLE.Count; i++)
@@ -52,12 +53,15 @@ namespace CrudGenerator.Utility
                     }
                 }
 
-                tbl.Clear();
-                cmd.CommandText = "select COLUMN_NAME, TABLE_NAME from INFORMATION_SCHEMA.COLUMNS where COLUMNPROPERTY(object_id(TABLE_SCHEMA + '.' + TABLE_NAME), COLUMN_NAME, 'IsIdentity') = 1 order by TABLE_NAME ";
-                da.Fill(tbl);
-                for (int i = 0; i < tbl.Rows.Count; i++)
+                for (int i = 0; i < CrudUtilities.LIST_TABLE.Count; i++)
                 {
-                    CrudUtilities.LIST_IDENTITY_COLUMN.Add(new TableColumn { ColumnName = tbl.Rows[i]["COLUMN_NAME"].ToString(), TableName = tbl.Rows[i]["TABLE_NAME"].ToString() });
+                    tbl.Clear();
+                    cmd.CommandText = "select COLUMN_NAME, TABLE_NAME from INFORMATION_SCHEMA.COLUMNS where COLUMNPROPERTY(object_id(TABLE_SCHEMA + '.' + TABLE_NAME), COLUMN_NAME, 'IsIdentity') = 1 and TABLE_NAME ='" + CrudUtilities.LIST_TABLE[i].TableName + "' order by TABLE_NAME ";
+                    da.Fill(tbl);
+                    for (int j = 0; j < tbl.Rows.Count; j++)
+                    {
+                        CrudUtilities.LIST_IDENTITY_COLUMN.Add(new TableColumn { ColumnName = tbl.Rows[j]["COLUMN_NAME"].ToString(), TableName = tbl.Rows[j]["TABLE_NAME"].ToString() });
+                    }
                 }
                 sqlConnection.Close();
             }
@@ -76,12 +80,11 @@ namespace CrudGenerator.Utility
         /// Tạo thủ tục SQL Create.
         /// Nếu có cột id tự tăng thủ tục sẽ có param ReturnData trả về id đó, nếu không thì param ReturnData trả về -1.
         /// </summary>
-        /// <param name="listTable"></param>
         /// <returns></returns>
-        public static StringBuilder GenerateCreate(List<Table> listTable)
+        public static StringBuilder GenerateCreate()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (Table table in listTable)
+            foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 bool hasIdentityColumn = false;
                 string procName = "CRUD_" + table.TableName + "_Create";
@@ -155,12 +158,11 @@ namespace CrudGenerator.Utility
         /// Các cột thuộc mảng LIST_EXCLUDE_READ_PARAM_COLUMN_NAME sẽ không được truyền vào search parameter.
         /// Nếu bảng có cột Status thì sẽ lấy những bản ghi có Status >= 0.
         /// </summary>
-        /// <param name="listTable"></param>
         /// <returns></returns>
-        public static StringBuilder GenerateRead(List<Table> listTable)
+        public static StringBuilder GenerateRead()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (Table table in listTable)
+            foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 string statusColumnName = null;
                 Table currentTable = table;
@@ -229,12 +231,11 @@ namespace CrudGenerator.Utility
         /// Id truyền vào là cột có id tự tăng của bảng.
         /// Những bảng nào không có id tự tăng thì sẽ bỏ qua bảng đó.
         /// </summary>
-        /// <param name="listTable"></param>
         /// <returns></returns>
-        public static StringBuilder GenerateUpdate(List<Table> listTable)
+        public static StringBuilder GenerateUpdate()
         {
             StringBuilder returnData = new StringBuilder();
-            foreach (Table table in listTable)
+            foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 StringBuilder sb = new StringBuilder();
                 string identityColumnName = null;
@@ -299,12 +300,11 @@ namespace CrudGenerator.Utility
         /// Nếu bảng có trường Status thì sẽ update Status = -1, còn không sẽ xóa bản ghi của bảng đó.
         /// Những bảng nào không có id tự tăng thì sẽ bỏ qua bảng đó.
         /// </summary>
-        /// <param name="listTable"></param>
         /// <returns></returns>
-        public static StringBuilder GenerateDelete(List<Table> listTable)
+        public static StringBuilder GenerateDelete()
         {
             StringBuilder returnData = new StringBuilder();
-            foreach (Table table in listTable)
+            foreach(Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 StringBuilder sb = new StringBuilder();
                 string identityColumnName = null;

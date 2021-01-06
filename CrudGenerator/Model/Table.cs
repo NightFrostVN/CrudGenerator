@@ -10,6 +10,7 @@ namespace CrudGenerator.Model
     {
         private string tableName;
         private List<TableColumn> tableColumn = new List<TableColumn>();
+        private bool active;
 
         public string TableName
         {
@@ -34,6 +35,19 @@ namespace CrudGenerator.Model
             set
             {
                 tableColumn = value;
+            }
+        }
+
+        public bool Active
+        {
+            get
+            {
+                return active;
+            }
+
+            set
+            {
+                active = value;
             }
         }
     }
