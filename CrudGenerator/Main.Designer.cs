@@ -34,13 +34,15 @@
             this.txtOutput = new System.Windows.Forms.TextBox();
             this.ckListTable = new System.Windows.Forms.CheckedListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnGenerate = new System.Windows.Forms.Button();
-            this.ckGenerateConnection = new System.Windows.Forms.CheckBox();
-            this.ckGenerateModel = new System.Windows.Forms.CheckBox();
-            this.ckGenerateRepository = new System.Windows.Forms.CheckBox();
             this.ckGenerateManipulation = new System.Windows.Forms.CheckBox();
+            this.ckGenerateRepository = new System.Windows.Forms.CheckBox();
+            this.ckGenerateModel = new System.Windows.Forms.CheckBox();
+            this.ckGenerateConnection = new System.Windows.Forms.CheckBox();
+            this.btnGenerate = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.lblStatus = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -84,8 +86,9 @@
             this.txtOutput.Location = new System.Drawing.Point(6, 19);
             this.txtOutput.Multiline = true;
             this.txtOutput.Name = "txtOutput";
+            this.txtOutput.ReadOnly = true;
             this.txtOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtOutput.Size = new System.Drawing.Size(545, 263);
+            this.txtOutput.Size = new System.Drawing.Size(545, 258);
             this.txtOutput.TabIndex = 3;
             // 
             // ckListTable
@@ -95,10 +98,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ckListTable.CheckOnClick = true;
             this.ckListTable.FormattingEnabled = true;
+            this.ckListTable.IntegralHeight = false;
             this.ckListTable.Location = new System.Drawing.Point(6, 17);
             this.ckListTable.Name = "ckListTable";
             this.ckListTable.Size = new System.Drawing.Size(199, 379);
             this.ckListTable.TabIndex = 4;
+            this.ckListTable.SelectedIndexChanged += new System.EventHandler(this.ckListTable_SelectedIndexChanged);
             // 
             // groupBox1
             // 
@@ -116,40 +121,17 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Option";
             // 
-            // btnGenerate
+            // ckGenerateManipulation
             // 
-            this.btnGenerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnGenerate.Location = new System.Drawing.Point(482, 83);
-            this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.Size = new System.Drawing.Size(75, 23);
-            this.btnGenerate.TabIndex = 8;
-            this.btnGenerate.Text = "Generate";
-            this.btnGenerate.UseVisualStyleBackColor = true;
-            this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
-            // 
-            // ckGenerateConnection
-            // 
-            this.ckGenerateConnection.AutoSize = true;
-            this.ckGenerateConnection.Checked = true;
-            this.ckGenerateConnection.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ckGenerateConnection.Location = new System.Drawing.Point(6, 19);
-            this.ckGenerateConnection.Name = "ckGenerateConnection";
-            this.ckGenerateConnection.Size = new System.Drawing.Size(126, 17);
-            this.ckGenerateConnection.TabIndex = 9;
-            this.ckGenerateConnection.Text = "Generate connection";
-            this.ckGenerateConnection.UseVisualStyleBackColor = true;
-            // 
-            // ckGenerateModel
-            // 
-            this.ckGenerateModel.AutoSize = true;
-            this.ckGenerateModel.Checked = true;
-            this.ckGenerateModel.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ckGenerateModel.Location = new System.Drawing.Point(6, 42);
-            this.ckGenerateModel.Name = "ckGenerateModel";
-            this.ckGenerateModel.Size = new System.Drawing.Size(101, 17);
-            this.ckGenerateModel.TabIndex = 10;
-            this.ckGenerateModel.Text = "Generate model";
-            this.ckGenerateModel.UseVisualStyleBackColor = true;
+            this.ckGenerateManipulation.AutoSize = true;
+            this.ckGenerateManipulation.Checked = true;
+            this.ckGenerateManipulation.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckGenerateManipulation.Location = new System.Drawing.Point(6, 88);
+            this.ckGenerateManipulation.Name = "ckGenerateManipulation";
+            this.ckGenerateManipulation.Size = new System.Drawing.Size(132, 17);
+            this.ckGenerateManipulation.TabIndex = 12;
+            this.ckGenerateManipulation.Text = "Generate manipulation";
+            this.ckGenerateManipulation.UseVisualStyleBackColor = true;
             // 
             // ckGenerateRepository
             // 
@@ -163,17 +145,40 @@
             this.ckGenerateRepository.Text = "Generate repository";
             this.ckGenerateRepository.UseVisualStyleBackColor = true;
             // 
-            // ckGenerateManipulation
+            // ckGenerateModel
             // 
-            this.ckGenerateManipulation.AutoSize = true;
-            this.ckGenerateManipulation.Checked = true;
-            this.ckGenerateManipulation.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ckGenerateManipulation.Location = new System.Drawing.Point(6, 88);
-            this.ckGenerateManipulation.Name = "ckGenerateManipulation";
-            this.ckGenerateManipulation.Size = new System.Drawing.Size(132, 17);
-            this.ckGenerateManipulation.TabIndex = 12;
-            this.ckGenerateManipulation.Text = "Generate manipulation";
-            this.ckGenerateManipulation.UseVisualStyleBackColor = true;
+            this.ckGenerateModel.AutoSize = true;
+            this.ckGenerateModel.Checked = true;
+            this.ckGenerateModel.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckGenerateModel.Location = new System.Drawing.Point(6, 42);
+            this.ckGenerateModel.Name = "ckGenerateModel";
+            this.ckGenerateModel.Size = new System.Drawing.Size(101, 17);
+            this.ckGenerateModel.TabIndex = 10;
+            this.ckGenerateModel.Text = "Generate model";
+            this.ckGenerateModel.UseVisualStyleBackColor = true;
+            // 
+            // ckGenerateConnection
+            // 
+            this.ckGenerateConnection.AutoSize = true;
+            this.ckGenerateConnection.Checked = true;
+            this.ckGenerateConnection.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckGenerateConnection.Location = new System.Drawing.Point(6, 19);
+            this.ckGenerateConnection.Name = "ckGenerateConnection";
+            this.ckGenerateConnection.Size = new System.Drawing.Size(126, 17);
+            this.ckGenerateConnection.TabIndex = 9;
+            this.ckGenerateConnection.Text = "Generate connection";
+            this.ckGenerateConnection.UseVisualStyleBackColor = true;
+            // 
+            // btnGenerate
+            // 
+            this.btnGenerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnGenerate.Location = new System.Drawing.Point(482, 83);
+            this.btnGenerate.Name = "btnGenerate";
+            this.btnGenerate.Size = new System.Drawing.Size(75, 23);
+            this.btnGenerate.TabIndex = 8;
+            this.btnGenerate.Text = "Generate";
+            this.btnGenerate.UseVisualStyleBackColor = true;
+            this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
             // 
             // groupBox2
             // 
@@ -182,7 +187,7 @@
             this.groupBox2.Controls.Add(this.ckListTable);
             this.groupBox2.Location = new System.Drawing.Point(12, 36);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(211, 407);
+            this.groupBox2.Size = new System.Drawing.Size(211, 402);
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "List table";
@@ -195,22 +200,40 @@
             this.groupBox3.Controls.Add(this.txtOutput);
             this.groupBox3.Location = new System.Drawing.Point(235, 155);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(557, 288);
+            this.groupBox3.Size = new System.Drawing.Size(557, 283);
             this.groupBox3.TabIndex = 9;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "SQL Output";
+            // 
+            // progressBar
+            // 
+            this.progressBar.Location = new System.Drawing.Point(692, 444);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(100, 23);
+            this.progressBar.TabIndex = 10;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Location = new System.Drawing.Point(480, 444);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(206, 23);
+            this.lblStatus.TabIndex = 11;
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(804, 455);
+            this.ClientSize = new System.Drawing.Size(804, 474);
+            this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.txtConnectionString);
             this.Controls.Add(this.label1);
+            this.Cursor = System.Windows.Forms.Cursors.Default;
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "CRUD Generator";
@@ -239,6 +262,8 @@
         private System.Windows.Forms.CheckBox ckGenerateManipulation;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.Label lblStatus;
     }
 }
 
