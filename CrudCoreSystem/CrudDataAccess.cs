@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
+using static CrudCoreSystem.CustomAttribute;
 
 namespace CrudCoreSystem
 {
@@ -12,23 +13,11 @@ namespace CrudCoreSystem
     /// </summary>
     public class CrudDataAccess
     {
-        /// <summary>
-        /// List các tên cột không cho vào param khi read
-        /// </summary>
-        private List<string> LIST_EXCLUDE_READ_PARAM_COLUMN_NAME = new List<string>()
-        {
-            "CreatedBy",
-            "ModifiedBy",
-            "CreatedDate",
-            "ModifiedDate"
-        };
-
         private SqlConnection conn;
 
         #region "Properties"
         public object ObjModel { private get; set; }
         public DataTable ReturnDataTable { get; private set; }
-        public string IdentityColumnName { get; set; }
         public int ReturnCode { get; private set; }
         public string ReturnMess { get; private set; }
         public int ReturnData { get; private set; }
@@ -121,6 +110,8 @@ namespace CrudCoreSystem
                 //param input
                 foreach (var info in arrObjectInfo)
                 {
+                    if (Attribute.IsDefined(info, typeof(DateSearchField)))
+                        continue;
                     if (!isDelete)
                     {
                         SqlParameter param = new SqlParameter();
@@ -135,14 +126,7 @@ namespace CrudCoreSystem
                     }
                     else
                     {
-                        if (string.IsNullOrWhiteSpace(IdentityColumnName))
-                        {
-                            ReturnCode = -1;
-                            ReturnMess = "Identity column not found!";
-                            ReturnData = -1;
-                            return;
-                        }
-                        if (info.Name.Equals(IdentityColumnName))
+                        if (Attribute.IsDefined(info, typeof(IdentityField)))
                         {
                             SqlParameter param = new SqlParameter();
                             param.ParameterName = "@" + info.Name;
@@ -155,6 +139,10 @@ namespace CrudCoreSystem
                             cmd.Parameters.Add(param);
                             break;
                         }
+                        ReturnCode = -1;
+                        ReturnMess = "Identity column not found!";
+                        ReturnData = -1;
+                        return;
                     }
                 }
 
@@ -202,8 +190,6 @@ namespace CrudCoreSystem
                 //param input
                 foreach (var info in arrObjectInfo)
                 {
-                    if (LIST_EXCLUDE_READ_PARAM_COLUMN_NAME.Contains(info.Name))
-                        continue;
                     SqlParameter param = new SqlParameter();
                     param.ParameterName = "@" + info.Name;
                     var value = (object)DBNull.Value;

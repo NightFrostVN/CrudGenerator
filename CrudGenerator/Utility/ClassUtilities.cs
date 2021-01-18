@@ -53,6 +53,7 @@ namespace CrudGenerator.Utility
             {
                 string modelName = table.TableName;
                 sb.AppendLine("using System;");
+                sb.AppendLine("using static CrudCoreSystem.CustomAttribute;");
                 sb.AppendLine("");
                 sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME);
                 sb.AppendLine("{");
@@ -60,12 +61,23 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("    {");
                 foreach (TableColumn column in table.TableColumn)
                 {
-                    if (CrudUtilities.IsIntDataTypeColumn(column))
+                    if (CrudUtilities.IsIdentityColumn(column))
+                    {
+                        sb.AppendLine("        [IdentityField]");
+                        sb.AppendLine("        public int? " + column.ColumnName + " { get; set; }");
+                    }
+                    else if (CrudUtilities.IsIntDataTypeColumn(column))
                         sb.AppendLine("        public int? " + column.ColumnName + " { get; set; }");
                     else if (CrudUtilities.IsCharDataTypeColumn(column))
                         sb.AppendLine("        public string " + column.ColumnName + " { get; set; }");
                     else if (CrudUtilities.IsDateDataTypeColumn(column))
+                    {
                         sb.AppendLine("        public DateTime? " + column.ColumnName + " { get; set; }");
+                        sb.AppendLine("        [DateSearchField]");
+                        sb.AppendLine("        public DateTime? " + column.ColumnName + "From { get; set; }");
+                        sb.AppendLine("        [DateSearchField]");
+                        sb.AppendLine("        public DateTime? " + column.ColumnName + "To { get; set; }");
+                    }
                     else if (CrudUtilities.IsFloatDataTypeColumn(column))
                         sb.AppendLine("        public float? " + column.ColumnName + " { get; set; }");
                 }
@@ -115,7 +127,6 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("        protected " + modelName + DATA_MANIPULATION_FOLDER_NAME + "()");
                 sb.AppendLine("        {");
                 sb.AppendLine("            SetupConnection(DatabaseConnectionString.CONNECTION_STRING);");
-                sb.AppendLine("            IdentityColumnName = \"" + identityColumnName + "\";");
                 sb.AppendLine("        }");
                 sb.AppendLine("");
                 sb.AppendLine("        public void Create(" + modelName + " _objModel)");
@@ -162,11 +173,12 @@ namespace CrudGenerator.Utility
                     sb.AppendLine("            ObjModel = _objModel;");
                     sb.AppendLine("            Delete();");
                     sb.AppendLine("        }");
-                    sb.AppendLine("        public new void ExecuteProcedure(string procedureName, List<SqlParameter> listParam, bool isReturnDataTable)");
-                    sb.AppendLine("        {");
-                    sb.AppendLine("            base.ExecuteProcedure(procedureName, listParam, isReturnDataTable);");
-                    sb.AppendLine("        }");
+                    sb.AppendLine("");
                 }
+                sb.AppendLine("        public new void ExecuteProcedure(string procedureName, List<SqlParameter> listParam, bool isReturnDataTable)");
+                sb.AppendLine("        {");
+                sb.AppendLine("            base.ExecuteProcedure(procedureName, listParam, isReturnDataTable);");
+                sb.AppendLine("        }");
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
                 using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME + "\\" + modelName + DATA_MANIPULATION_FOLDER_NAME + ".cs"))

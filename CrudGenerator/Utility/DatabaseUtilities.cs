@@ -155,8 +155,7 @@ namespace CrudGenerator.Utility
 
         /// <summary>
         /// Tạo thủ tục SQL Read.
-        /// Các cột thuộc mảng LIST_EXCLUDE_READ_PARAM_COLUMN_NAME sẽ không được truyền vào search parameter.
-        /// Nếu bảng có cột Status thì sẽ lấy những bản ghi có Status >= 0.
+        /// Nếu bảng có cột Status thì sẽ lấy những bản ghi có Status != DELETE_STATUS.
         /// </summary>
         /// <returns></returns>
         public static StringBuilder GenerateRead()
@@ -169,8 +168,6 @@ namespace CrudGenerator.Utility
                 List<TableColumn> listParam = new List<TableColumn>(table.TableColumn);
                 foreach (TableColumn tableColumn in currentTable.TableColumn)
                 {
-                    if (CrudUtilities.LIST_EXCLUDE_READ_PARAM_COLUMN_NAME.Contains(tableColumn.ColumnName))
-                        listParam.Remove(tableColumn);
                     if (CrudUtilities.IsStatusColumn(tableColumn))
                         statusColumnName = tableColumn.ColumnName;
                 }
@@ -184,7 +181,15 @@ namespace CrudGenerator.Utility
                     if (CrudUtilities.IsMaxLengthColumn(listParam[i]))
                         sb.Append("@" + listParam[i].ColumnName + " " + listParam[i].DataType + "(" + listParam[i].MaxLength + ")");
                     else
+                    {
                         sb.Append("@" + listParam[i].ColumnName + " " + listParam[i].DataType);
+                        if (listParam[i].DataType == "datetime")
+                        {
+                            sb.AppendLine(",");
+                            sb.AppendLine("@" + listParam[i].ColumnName + "From " + listParam[i].DataType + ",");
+                            sb.Append("@" + listParam[i].ColumnName + "To " + listParam[i].DataType + "");
+                        }
+                    }
 
                     if (i < listParam.Count - 1)
                         sb.AppendLine(",");
@@ -196,7 +201,7 @@ namespace CrudGenerator.Utility
 
                 if (!string.IsNullOrWhiteSpace(statusColumnName))
                 {
-                    sb.Append("    (a.[" + statusColumnName + "] >= 0)");
+                    sb.Append("    (a.[" + statusColumnName + "] != " + CrudUtilities.DELETE_STATUS + ")");
                     if (listParam.Count > 0)
                         sb.AppendLine(" and");
                 }
@@ -206,6 +211,13 @@ namespace CrudGenerator.Utility
                         sb.Append("    (@" + listParam[i].ColumnName + " IS NULL OR a.[" + listParam[i].ColumnName + "] = @" + listParam[i].ColumnName + ")");
                     else
                         sb.Append("    (@" + listParam[i].ColumnName + " IS NULL OR a.[" + listParam[i].ColumnName + "] like N'%' + @" + listParam[i].ColumnName + " + '%')");
+
+                    if (listParam[i].DataType == "datetime")
+                    {
+                        sb.AppendLine(" and");
+                        sb.AppendLine("    (@" + listParam[i].ColumnName + "From IS NULL OR a.[" + listParam[i].ColumnName + "] >= @" + listParam[i].ColumnName + "From) and");
+                        sb.Append("    (@" + listParam[i].ColumnName + "To IS NULL OR a.[" + listParam[i].ColumnName + "] <= @" + listParam[i].ColumnName + "To)");
+                    }
 
                     if (i < listParam.Count - 1)
                         sb.AppendLine(" and");
@@ -297,7 +309,7 @@ namespace CrudGenerator.Utility
 
         /// <summary>
         /// Tạo thủ tục SQL Delete.
-        /// Nếu bảng có trường Status thì sẽ update Status = -1, còn không sẽ xóa bản ghi của bảng đó.
+        /// Nếu bảng có trường Status thì sẽ update Status = DELETE_STATUS, còn không sẽ xóa bản ghi của bảng đó.
         /// Những bảng nào không có id tự tăng thì sẽ bỏ qua bảng đó.
         /// </summary>
         /// <returns></returns>
@@ -343,8 +355,8 @@ namespace CrudGenerator.Utility
                 }
                 else
                 {
-                    //Update status = -1
-                    sb.AppendLine("    update [" + table.TableName + "] set [" + statusColumnName + "] = -1 where " + identityColumnName + " = @" + identityColumnName + ";");
+                    //Update status = DELETE_STATUS
+                    sb.AppendLine("    update [" + table.TableName + "] set [" + statusColumnName + "] = " + CrudUtilities.DELETE_STATUS + " where " + identityColumnName + " = @" + identityColumnName + ";");
                 }
                 sb.AppendLine("end try");
                 sb.AppendLine("begin catch");

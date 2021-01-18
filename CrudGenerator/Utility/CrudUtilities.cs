@@ -24,24 +24,18 @@ namespace CrudGenerator.Utility
         };
 
         /// <summary>
-        /// List các tên cột không cho vào param khi read.
-        /// </summary>
-        public static List<string> LIST_EXCLUDE_READ_PARAM_COLUMN_NAME = new List<string>()
-        {
-            "CreatedBy",
-            "ModifiedBy",
-            "CreatedDate",
-            "ModifiedDate"
-        };
-
-        /// <summary>
-        /// List các kiểu dữ liệu không cho vào param khi read.
+        /// List các kiểu dữ liệu không cho vào param khi read, do các kiểu dữ liệu này không hỗ trợ câu lệnh like trong SQL.
         /// </summary>
         public static List<string> LIST_EXCLUDE_READ_PARAM_COLUMN_DATA_TYPE = new List<string>()
         {
             "text",
             "ntext"
         };
+
+        /// <summary>
+        /// Giá trị cột Status với những bản ghi đã bị xóa
+        /// </summary>
+        public static string DELETE_STATUS = "-1";
 
         /// <summary>
         /// Kiểm tra xem có phải cột id tự tăng không.
