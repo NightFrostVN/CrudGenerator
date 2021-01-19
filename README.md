@@ -142,7 +142,6 @@ DataTable dtLichSuGiaHan = repo.GetLichSuGiaHan(Convert.ToInt32(Request.Params["
 ## Known issues
 
 ## To-do list
-- Tìm kiếm dữ liệu theo kiểu từ ngày - đến ngày.
-- Thêm tính năng sử dụng trên nhiều DB.
+- Thêm tính năng phân trang dữ liệu.
 - Update tài liệu đặc tả.
 - Update chức năng.
