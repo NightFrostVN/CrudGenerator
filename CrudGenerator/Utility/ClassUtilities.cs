@@ -1,10 +1,9 @@
 ﻿using CrudGenerator.Model;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace CrudGenerator.Utility
 {
@@ -16,6 +15,7 @@ namespace CrudGenerator.Utility
         private static string REPOSITORY_FOLDER_NAME = "DataRepository";
         private static string MODEL_FOLDER_NAME = "DataModel";
         private static string DATABASE_CONFIG_FOLDER_NAME = "DatabaseConfig";
+        private static string DATABASE_NAME = "DB";
 
         /// <summary>
         /// Tạo class lưu chuỗi kết nối.
@@ -23,6 +23,14 @@ namespace CrudGenerator.Utility
         /// <param name="connectionString"></param>
         public static void GenerateConnection(string connectionString)
         {
+            string[] arr = connectionString.Split(';');
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i].Contains("Database="))
+                {
+                    DATABASE_NAME = Regex.Replace(arr[i].Split('=')[1], "[^a-zA-Z0-9]", "");
+                }
+            }
             Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATABASE_CONFIG_FOLDER_NAME);
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + DATABASE_CONFIG_FOLDER_NAME);
@@ -32,7 +40,7 @@ namespace CrudGenerator.Utility
             sb.AppendLine("    /// </summary>");
             sb.AppendLine("    public class DatabaseConnectionString");
             sb.AppendLine("    {");
-            sb.AppendLine("        public static string CONNECTION_STRING = \"" + connectionString + "\";");
+            sb.AppendLine("        public static string CONNECTION_STRING_DB_" + DATABASE_NAME.ToUpper() + " = \"" + connectionString + "\";");
             sb.AppendLine("    }");
             sb.AppendLine("}");
             using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATABASE_CONFIG_FOLDER_NAME + "\\DatabaseConnectionString.cs"))
@@ -47,7 +55,7 @@ namespace CrudGenerator.Utility
         /// </summary>
         public static void GenerateModel()
         {
-            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME);
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME + "\\" + DATABASE_NAME);
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
@@ -55,7 +63,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("using System;");
                 sb.AppendLine("using static CrudCoreSystem.CustomAttribute;");
                 sb.AppendLine("");
-                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME);
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME + "." + DATABASE_NAME);
                 sb.AppendLine("{");
                 sb.AppendLine("    public class " + modelName);
                 sb.AppendLine("    {");
@@ -83,7 +91,7 @@ namespace CrudGenerator.Utility
                 }
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
-                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME + "\\" + modelName + ".cs"))
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME + "\\" + DATABASE_NAME + "\\" + modelName + ".cs"))
                 {
                     file.WriteLine(sb.ToString());
                 }
@@ -97,7 +105,7 @@ namespace CrudGenerator.Utility
         /// </summary>
         public static void GenerateManipulation()
         {
-            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME);
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME + "\\" + DATABASE_NAME);
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
@@ -109,14 +117,14 @@ namespace CrudGenerator.Utility
                         identityColumnName = column.ColumnName;
                 }
                 sb.AppendLine("using CrudCoreSystem;");
-                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME + ";");
+                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME + "." + DATABASE_NAME + ";");
                 sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATABASE_CONFIG_FOLDER_NAME + ";");
                 sb.AppendLine("using System;");
                 sb.AppendLine("using System.Collections.Generic;");
                 sb.AppendLine("using System.Data;");
                 sb.AppendLine("using System.Data.SqlClient;");
                 sb.AppendLine("");
-                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME );
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME + "." + DATABASE_NAME);
                 sb.AppendLine("{");
                 sb.AppendLine("    /// <summary>");
                 sb.AppendLine("    /// Class lưu các hàm CRUD bảng " + modelName + ".");
@@ -126,7 +134,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("    {");
                 sb.AppendLine("        protected " + modelName + DATA_MANIPULATION_FOLDER_NAME + "()");
                 sb.AppendLine("        {");
-                sb.AppendLine("            SetupConnection(DatabaseConnectionString.CONNECTION_STRING);");
+                sb.AppendLine("            SetupConnection(DatabaseConnectionString.CONNECTION_STRING_DB_" + DATABASE_NAME.ToUpper() + ");");
                 sb.AppendLine("        }");
                 sb.AppendLine("");
                 sb.AppendLine("        public void Create(" + modelName + " _objModel)");
@@ -181,7 +189,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("        }");
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
-                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME + "\\" + modelName + DATA_MANIPULATION_FOLDER_NAME + ".cs"))
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MANIPULATION_FOLDER_NAME + "\\" + DATABASE_NAME + "\\" + modelName + DATA_MANIPULATION_FOLDER_NAME + ".cs"))
                 {
                     file.WriteLine(sb.ToString());
                 }
@@ -194,14 +202,14 @@ namespace CrudGenerator.Utility
         /// </summary>
         public static void GenerateRepository()
         {
-            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME);
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME + "\\" + DATABASE_NAME);
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 string modelName = table.TableName;
-                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME + ";");
+                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME + "." + DATABASE_NAME + ";");
                 sb.AppendLine("");
-                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + REPOSITORY_FOLDER_NAME);
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + REPOSITORY_FOLDER_NAME + "." + DATABASE_NAME);
                 sb.AppendLine("{");
                 sb.AppendLine("    /// <summary>");
                 sb.AppendLine("    /// Class lưu các phương thức thao tác dữ liệu khác của bảng " + modelName + ".");
@@ -211,7 +219,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("");
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
-                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME + "\\" + modelName + REPOSITORY_FOLDER_NAME + ".cs"))
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME + "\\" + DATABASE_NAME + "\\" + modelName + REPOSITORY_FOLDER_NAME + ".cs"))
                 {
                     file.WriteLine(sb.ToString());
                 }

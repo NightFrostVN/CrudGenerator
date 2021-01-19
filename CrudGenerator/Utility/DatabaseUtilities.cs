@@ -163,6 +163,7 @@ namespace CrudGenerator.Utility
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
+                int paramCount = table.TableColumn.Count;
                 string statusColumnName = null;
                 Table currentTable = table;
                 List<TableColumn> listParam = new List<TableColumn>(table.TableColumn);
@@ -188,6 +189,7 @@ namespace CrudGenerator.Utility
                             sb.AppendLine(",");
                             sb.AppendLine("@" + listParam[i].ColumnName + "From " + listParam[i].DataType + ",");
                             sb.Append("@" + listParam[i].ColumnName + "To " + listParam[i].DataType + "");
+                            paramCount += 2;
                         }
                     }
 
@@ -197,7 +199,14 @@ namespace CrudGenerator.Utility
                         sb.AppendLine();
                 }
                 sb.AppendLine("as");
-                sb.AppendLine("select * from [" + table.TableName + "] a where ");
+                sb.Append("select ");
+                foreach (TableColumn tableColumn in currentTable.TableColumn)
+                {
+                    sb.Append("[" + tableColumn.ColumnName + "], ");
+                }
+                sb.Length--;
+                sb.Length--;
+                sb.AppendLine(" from [" + table.TableName + "] a where ");
 
                 if (!string.IsNullOrWhiteSpace(statusColumnName))
                 {
@@ -225,13 +234,13 @@ namespace CrudGenerator.Utility
                         sb.AppendLine();
                 }
                 sb.Append("--" + procName + " ");
-                for (int i = 0; i < listParam.Count; i++)
+                for (int i = 0; i < paramCount; i++)
                 {
-                    if (i < listParam.Count - 1)
-                        sb.Append("null, ");
-                    else
-                        sb.AppendLine("null");
+                    sb.Append("null, ");
                 }
+                sb.Length--;
+                sb.Length--;
+                sb.AppendLine();
                 sb.AppendLine("go");
                 sb.AppendLine();
             }
