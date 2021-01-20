@@ -11,7 +11,7 @@ namespace CrudCoreSystem
     /// Class lưu các hàm thực hiện CRUD chung.
     /// KHÔNG ĐƯỢC SỬA HOẶC KHAI BÁO THÊM HÀM TRONG CLASS NÀY.
     /// </summary>
-    public class CrudDataAccess
+    public class CrudDataAccess : ICrudReturnData
     {
         private SqlConnection conn;
 
@@ -57,21 +57,27 @@ namespace CrudCoreSystem
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(procedureName, conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                foreach (SqlParameter param in listParam)
+                if (listParam != null)
                 {
-                    cmd.Parameters.Add(param);
+                    foreach (SqlParameter param in listParam)
+                    {
+                        cmd.Parameters.Add(param);
+                    }
                 }
                 if (!isReturnDataTable)
                 {
                     cmd.ExecuteNonQuery();
-                    foreach (SqlParameter param in cmd.Parameters)
+                    if (listParam != null)
                     {
-                        if (param.ParameterName.Equals("@ReturnCode"))
-                            ReturnCode = string.IsNullOrWhiteSpace(param.Value.ToString()) ? -1 : Convert.ToInt32(param.Value.ToString());
-                        if (param.ParameterName.Equals("@ReturnMess"))
-                            ReturnMess = param.Value.ToString();
-                        if (param.ParameterName.Equals("@ReturnData"))
-                            ReturnData = string.IsNullOrWhiteSpace(param.Value.ToString()) ? -1 : Convert.ToInt32(param.Value.ToString());
+                        foreach (SqlParameter param in cmd.Parameters)
+                        {
+                            if (param.ParameterName.Equals(CrudConstant.RETURN_CODE_PARAM_NAME))
+                                ReturnCode = string.IsNullOrWhiteSpace(param.Value.ToString()) ? CrudConstant.RETURN_DATA_DEFAULT : Convert.ToInt32(param.Value.ToString());
+                            if (param.ParameterName.Equals(CrudConstant.RETURN_MESS_PARAM_NAME))
+                                ReturnMess = param.Value.ToString();
+                            if (param.ParameterName.Equals(CrudConstant.RETURN_DATA_PARAM_NAME))
+                                ReturnData = string.IsNullOrWhiteSpace(param.Value.ToString()) ? CrudConstant.RETURN_DATA_DEFAULT : Convert.ToInt32(param.Value.ToString());
+                        }
                     }
                 }
                 else
@@ -82,16 +88,16 @@ namespace CrudCoreSystem
                     da.Fill(ReturnDataTable);
                     da.Dispose();
 
-                    ReturnCode = 0;
-                    ReturnMess = "success";
-                    ReturnData = -1;
+                    ReturnCode = CrudConstant.RETURN_CODE_SUCCESS;
+                    ReturnMess = CrudConstant.RETURN_MESS_SUCCESS;
+                    ReturnData = CrudConstant.RETURN_DATA_DEFAULT;
                 }
             }
             catch (Exception e1)
             {
-                ReturnCode = -1;
+                ReturnCode = CrudConstant.RETURN_CODE_FAIL;
                 ReturnMess = e1.ToString();
-                ReturnData = -1;
+                ReturnData = CrudConstant.RETURN_DATA_DEFAULT;
             }
             finally
             {
@@ -139,9 +145,9 @@ namespace CrudCoreSystem
                             cmd.Parameters.Add(param);
                             break;
                         }
-                        ReturnCode = -1;
+                        ReturnCode = CrudConstant.RETURN_CODE_FAIL;
                         ReturnMess = "Identity column not found!";
-                        ReturnData = -1;
+                        ReturnData = CrudConstant.RETURN_DATA_DEFAULT;
                         return;
                     }
                 }
@@ -150,28 +156,28 @@ namespace CrudCoreSystem
                 SqlParameter paramReturnCode;
                 SqlParameter paramReturnMess;
                 SqlParameter paramReturnData;
-                paramReturnData = cmd.Parameters.Add("@ReturnData", SqlDbType.Int);
+                paramReturnData = cmd.Parameters.Add(CrudConstant.RETURN_DATA_PARAM_NAME, SqlDbType.Int);
                 paramReturnData.Direction = ParameterDirection.Output;
-                paramReturnCode = cmd.Parameters.Add("@ReturnCode", SqlDbType.Int);
+                paramReturnCode = cmd.Parameters.Add(CrudConstant.RETURN_CODE_PARAM_NAME, SqlDbType.Int);
                 paramReturnCode.Direction = ParameterDirection.Output;
-                paramReturnMess = cmd.Parameters.Add("@ReturnMess", SqlDbType.NVarChar, 500);
+                paramReturnMess = cmd.Parameters.Add(CrudConstant.RETURN_MESS_PARAM_NAME, SqlDbType.NVarChar, 500);
                 paramReturnMess.Direction = ParameterDirection.Output;
                 cmd.ExecuteNonQuery();
                 foreach (SqlParameter param in cmd.Parameters)
                 {
-                    if (param.ParameterName.Equals("@ReturnCode"))
-                        ReturnCode = string.IsNullOrWhiteSpace(param.Value.ToString()) ? -1 : Convert.ToInt32(param.Value.ToString());
-                    if (param.ParameterName.Equals("@ReturnMess"))
+                    if (param.ParameterName.Equals(CrudConstant.RETURN_CODE_PARAM_NAME))
+                        ReturnCode = string.IsNullOrWhiteSpace(param.Value.ToString()) ? CrudConstant.RETURN_DATA_DEFAULT : Convert.ToInt32(param.Value.ToString());
+                    if (param.ParameterName.Equals(CrudConstant.RETURN_MESS_PARAM_NAME))
                         ReturnMess = param.Value.ToString();
-                    if (param.ParameterName.Equals("@ReturnData"))
-                        ReturnData = string.IsNullOrWhiteSpace(param.Value.ToString()) ? -1 : Convert.ToInt32(param.Value.ToString());
+                    if (param.ParameterName.Equals(CrudConstant.RETURN_DATA_PARAM_NAME))
+                        ReturnData = string.IsNullOrWhiteSpace(param.Value.ToString()) ? CrudConstant.RETURN_DATA_DEFAULT : Convert.ToInt32(param.Value.ToString());
                 }
             }
             catch (Exception e1)
             {
-                ReturnCode = -1;
+                ReturnCode = CrudConstant.RETURN_CODE_FAIL;
                 ReturnMess = e1.ToString();
-                ReturnData = -1;
+                ReturnData = CrudConstant.RETURN_DATA_DEFAULT;
             }
             finally
             {
@@ -204,15 +210,15 @@ namespace CrudCoreSystem
                 da.Fill(ReturnDataTable);
                 da.Dispose();
 
-                ReturnCode = 0;
-                ReturnMess = "success";
-                ReturnData = -1;
+                ReturnCode = CrudConstant.RETURN_CODE_SUCCESS;
+                ReturnMess = CrudConstant.RETURN_MESS_SUCCESS;
+                ReturnData = CrudConstant.RETURN_DATA_DEFAULT;
             }
             catch (Exception e1)
             {
-                ReturnCode = -1;
+                ReturnCode = CrudConstant.RETURN_CODE_FAIL;
                 ReturnMess = e1.ToString();
-                ReturnData = -1;
+                ReturnData = CrudConstant.RETURN_DATA_DEFAULT;
             }
             finally
             {

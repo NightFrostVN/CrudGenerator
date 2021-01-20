@@ -12,8 +12,8 @@ namespace CrudGenerator.Utility
         private static string ROOT_PATH = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
         private static string DATA_ACCESS_FOLDER_NAME = "DataAccess";
         private static string DATA_MANIPULATION_FOLDER_NAME = "DataManipulation";
-        private static string REPOSITORY_FOLDER_NAME = "DataRepository";
-        private static string MODEL_FOLDER_NAME = "DataModel";
+        private static string DATA_REPOSITORY_FOLDER_NAME = "DataRepository";
+        private static string DATA_MODEL_FOLDER_NAME = "DataModel";
         private static string DATABASE_CONFIG_FOLDER_NAME = "DatabaseConfig";
         private static string DATABASE_NAME = "DB";
 
@@ -51,11 +51,11 @@ namespace CrudGenerator.Utility
         }
 
         /// <summary>
-        /// Tạo các class Model, lưu trong thư mục MODEL_FOLDER_NAME.
+        /// Tạo các class Model, lưu trong thư mục DATA_MODEL_FOLDER_NAME.
         /// </summary>
         public static void GenerateModel()
         {
-            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME + "\\" + DATABASE_NAME);
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MODEL_FOLDER_NAME + "\\" + DATABASE_NAME);
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
@@ -63,7 +63,7 @@ namespace CrudGenerator.Utility
                 sb.AppendLine("using System;");
                 sb.AppendLine("using static CrudCoreSystem.CustomAttribute;");
                 sb.AppendLine("");
-                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME + "." + DATABASE_NAME);
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MODEL_FOLDER_NAME + "." + DATABASE_NAME);
                 sb.AppendLine("{");
                 sb.AppendLine("    public class " + modelName);
                 sb.AppendLine("    {");
@@ -91,7 +91,7 @@ namespace CrudGenerator.Utility
                 }
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
-                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + MODEL_FOLDER_NAME + "\\" + DATABASE_NAME + "\\" + modelName + ".cs"))
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_MODEL_FOLDER_NAME + "\\" + DATABASE_NAME + "\\" + modelName + ".cs"))
                 {
                     file.WriteLine(sb.ToString());
                 }
@@ -114,10 +114,13 @@ namespace CrudGenerator.Utility
                 foreach (TableColumn column in table.TableColumn)
                 {
                     if (CrudUtilities.IsIdentityColumn(column))
+                    {
                         identityColumnName = column.ColumnName;
+                        break;
+                    }
                 }
                 sb.AppendLine("using CrudCoreSystem;");
-                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + MODEL_FOLDER_NAME + "." + DATABASE_NAME + ";");
+                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MODEL_FOLDER_NAME + "." + DATABASE_NAME + ";");
                 sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATABASE_CONFIG_FOLDER_NAME + ";");
                 sb.AppendLine("using System;");
                 sb.AppendLine("using System.Collections.Generic;");
@@ -198,28 +201,62 @@ namespace CrudGenerator.Utility
         }
 
         /// <summary>
-        /// Tạo các class Repository. Lưu trong thư mục REPOSITORY_FOLDER_NAME.
+        /// Tạo các class Repository và Interface. Lưu trong thư mục DATA_REPOSITORY_FOLDER_NAME.
         /// </summary>
         public static void GenerateRepository()
         {
-            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME + "\\" + DATABASE_NAME);
+            Directory.CreateDirectory(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_REPOSITORY_FOLDER_NAME + "\\" + DATABASE_NAME);
             StringBuilder sb = new StringBuilder();
             foreach (Table table in CrudUtilities.LIST_TABLE.Where(m => m.Active == true))
             {
                 string modelName = table.TableName;
                 sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MANIPULATION_FOLDER_NAME + "." + DATABASE_NAME + ";");
                 sb.AppendLine("");
-                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + REPOSITORY_FOLDER_NAME + "." + DATABASE_NAME);
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + DATA_REPOSITORY_FOLDER_NAME + "." + DATABASE_NAME);
                 sb.AppendLine("{");
                 sb.AppendLine("    /// <summary>");
                 sb.AppendLine("    /// Class lưu các phương thức thao tác dữ liệu khác của bảng " + modelName + ".");
                 sb.AppendLine("    /// </summary>");
-                sb.AppendLine("    public class " + modelName + REPOSITORY_FOLDER_NAME + " : " + modelName + DATA_MANIPULATION_FOLDER_NAME);
+                sb.AppendLine("    public class " + modelName + DATA_REPOSITORY_FOLDER_NAME + " : " + modelName + DATA_MANIPULATION_FOLDER_NAME + ", I" + modelName + DATA_REPOSITORY_FOLDER_NAME);
                 sb.AppendLine("    {");
                 sb.AppendLine("");
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
-                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + REPOSITORY_FOLDER_NAME + "\\" + DATABASE_NAME + "\\" + modelName + REPOSITORY_FOLDER_NAME + ".cs"))
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_REPOSITORY_FOLDER_NAME + "\\" + DATABASE_NAME + "\\" + modelName + DATA_REPOSITORY_FOLDER_NAME + ".cs"))
+                {
+                    file.WriteLine(sb.ToString());
+                }
+                sb.Clear();
+
+                string identityColumnName = "";
+                foreach (TableColumn column in table.TableColumn)
+                {
+                    if (CrudUtilities.IsIdentityColumn(column))
+                    {
+                        identityColumnName = column.ColumnName;
+                        break;
+                    }
+                }
+                sb.AppendLine("using " + DATA_ACCESS_FOLDER_NAME + "." + DATA_MODEL_FOLDER_NAME + "." + DATABASE_NAME + ";");
+                sb.AppendLine("using System.Collections.Generic;");
+                sb.AppendLine("using CrudCoreSystem;");
+                sb.AppendLine("");
+                sb.AppendLine("namespace " + DATA_ACCESS_FOLDER_NAME + "." + DATA_REPOSITORY_FOLDER_NAME + "." + DATABASE_NAME);
+                sb.AppendLine("{");
+                sb.AppendLine("    public interface I" + modelName + DATA_REPOSITORY_FOLDER_NAME + " : ICrudReturnData");
+                sb.AppendLine("    {");
+                sb.AppendLine("        #region Crud core function");
+                sb.AppendLine("        void Create(" + modelName + " _objModel);");
+                sb.AppendLine("        List<" + modelName + "> Read(" + modelName + " _objModel);");
+                if (!string.IsNullOrWhiteSpace(identityColumnName))
+                {
+                    sb.AppendLine("        void Update(" + modelName + " _objModel);");
+                    sb.AppendLine("        void Delete(" + modelName + " _objModel);");
+                }
+                sb.AppendLine("        #endregion");
+                sb.AppendLine("    }");
+                sb.AppendLine("}");
+                using (StreamWriter file = new StreamWriter(ROOT_PATH + "\\" + DATA_ACCESS_FOLDER_NAME + "\\" + DATA_REPOSITORY_FOLDER_NAME + "\\" + DATABASE_NAME + "\\I" + modelName + DATA_REPOSITORY_FOLDER_NAME + ".cs"))
                 {
                     file.WriteLine(sb.ToString());
                 }

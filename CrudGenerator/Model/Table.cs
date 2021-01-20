@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CrudGenerator.Model
 {
+    /// <summary>
+    /// Model lưu các bảng cần generate.
+    /// </summary>
     public class Table
     {
         private string tableName;
@@ -52,6 +55,9 @@ namespace CrudGenerator.Model
         }
     }
 
+    /// <summary>
+    /// Model lưu các cột của bảng.
+    /// </summary>
     public class TableColumn
     {
         private string tableName;

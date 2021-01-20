@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CrudCoreSystem
 {
@@ -13,7 +9,7 @@ namespace CrudCoreSystem
     public class CustomAttribute
     {
         /// <summary>
-        /// Dùng cho các trường có kiểu Id tự tăng
+        /// Dùng cho các trường có kiểu Id tự tăng.
         /// </summary>
         public class IdentityField : Attribute { }
 
